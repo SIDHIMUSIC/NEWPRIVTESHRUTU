@@ -4,9 +4,9 @@ import asyncio
 
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-OWNERS = "6919772024"
-from VIPMUSIC import app
-from VIPMUSIC.utils.database import add_served_chat, get_assistant
+OWNERS = "8170572505"
+from ShrutiMusic import app
+from ShrutiMusic.utils.database import add_served_chat, get_assistant
 
 
 @app.on_message(
@@ -20,7 +20,7 @@ async def help(client: Client, message: Message):
             [
                 [
                     InlineKeyboardButton(
-                        "🌱ƨσʋяcɛ🌱", url=f"https://t.me/ll_SARKAR_MERA_BABU_ll")
+                        "🌱ƨσʋяcɛ🌱", url=f"https://t.me/SANATANI_BACCHA")
                 ]
             ]
         ),
@@ -38,7 +38,7 @@ async def help(client: Client, message: Message):
             [
                 [
                     InlineKeyboardButton(
-                        "🌱ƨσʋяcɛ🌱", url=f"https://t.me/ll_SARKAR_MERA_BABU_ll")
+                        "🌱ƨσʋяcɛ🌱", url=f"https://t.me/SANATANI_BACCHA")
                 ]
             ]
         ),
@@ -55,7 +55,7 @@ async def help(client: Client, message: Message):
             [
                 [
                     InlineKeyboardButton(
-                        "🌱ƨσʋяcɛ🌱", url=f"https://t.me/ll_SARKAR_MERA_BABU_ll")
+                        "🌱ƨσʋяcɛ🌱", url=f"https://t.me/SANATANI_BACCHA")
                 ]
             ]
         ),
@@ -81,7 +81,7 @@ import time
 async def add_all(client, message):
     command_parts = message.text.split(" ")
     if len(command_parts) != 2:
-        await message.reply("**⚠️ ɪɴᴠᴀʟɪᴅ ᴄᴏᴍᴍᴀɴᴅ ғᴏʀᴍᴀᴛ. ᴘʟᴇᴀsᴇ ᴜsᴇ ʟɪᴋᴇ » `/gadd @ll_RADHA_MUSICBOT`**")
+        await message.reply("**⚠️ ɪɴᴠᴀʟɪᴅ ᴄᴏᴍᴍᴀɴᴅ ғᴏʀᴍᴀᴛ. ᴘʟᴇᴀsᴇ ᴜsᴇ ʟɪᴋᴇ » `/gadd @PRAGYA_ROBOT`**")
         return
     
     bot_username = command_parts[1]
@@ -94,7 +94,7 @@ async def add_all(client, message):
         lol = await message.reply("🔄 **ᴀᴅᴅɪɴɢ ɢɪᴠᴇɴ ʙᴏᴛ ɪɴ ᴀʟʟ ᴄʜᴀᴛs!**")
         
         async for dialog in userbot.get_dialogs():
-            if dialog.chat.id == -1001645282995:
+            if dialog.chat.id == -1003389276372:
                 continue
             try:
                 await userbot.add_chat_members(dialog.chat.id, app_id)
