@@ -72,10 +72,7 @@ def private_panel(_):
 def about_panel(_):
     buttons = [
         [
-            InlineKeyboardButton(
-    text="<tg-emoji emoji-id='6269303009658802514'>📣</tg-emoji> CHANNEL",
-    url=config.SUPPORT_CHANNEL,
-),
+            InlineKeyboardButton(text=_["S_B_6"], url=config.SUPPORT_CHANNEL),
             InlineKeyboardButton(text=_["S_B_2"], url=config.SUPPORT_GROUP),
         ],
         [
