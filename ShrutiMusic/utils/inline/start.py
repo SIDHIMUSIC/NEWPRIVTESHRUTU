@@ -72,11 +72,23 @@ def private_panel(_):
 def about_panel(_):
     buttons = [
         [
-            InlineKeyboardButton(text=_["S_B_6"], url=config.SUPPORT_CHANNEL),
-            InlineKeyboardButton(text=_["S_B_2"], url=config.SUPPORT_GROUP),
+            InlineKeyboardButton(
+                text=_["S_B_6"],
+                url=config.SUPPORT_CHANNEL,
+                icon_custom_emoji_id="5298609030321691620"  # Channel icon
+            ),
+            InlineKeyboardButton(
+                text=_["S_B_2"],
+                url=config.SUPPORT_GROUP,
+                icon_custom_emoji_id="6145316263125063653"  # Support/Group icon
+            ),
         ],
         [
-            InlineKeyboardButton(text=_["BACK_BUTTON"], callback_data="settingsback_helper")
+            InlineKeyboardButton(
+                text=_["BACK_BUTTON"],
+                callback_data="settingsback_helper",
+                icon_custom_emoji_id="5215260113291455937"  # Back icon
+            )
         ]
     ]
     return buttons
