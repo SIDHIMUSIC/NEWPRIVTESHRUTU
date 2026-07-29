@@ -8,9 +8,9 @@ from pyrogram.types import (
 from pyrogram.enums import ChatMemberStatus
 from ShrutiMusic import app
 
-OWNER_ID = 8170572505
+OWNER_ID = "8170572505"
 OWNER_USERNAME = "SANATANI_BACCHA"
-
+OWNERS = "8170572505"
 
 @app.on_chat_member_updated()
 async def owner_joined(_, update: ChatMemberUpdated):
