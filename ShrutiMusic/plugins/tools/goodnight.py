@@ -15,29 +15,39 @@ def get_random_sticker():
     return random.choice(stickers)
 
 
-def get_random_emoji():
+def get_morning_emoji():
+    return random.choice(["🌞", "🌅", "☀️", "😊"])
+
+
+def get_night_emoji():
     return random.choice(["😴", "😪", "💤"])
 
 
-@app.on_message(
-    filters.command(
-        ["gn", "n", "oodnight", "ood Night", "ood night"],
-        prefixes=["/", "g", "G"],
-    )
-)
-async def goodnight_command_handler(_, message: Message):
+# Good Morning
+@app.on_message(filters.command(["gm", "goodmorning", "good_morning"]))
+async def goodmorning_command_handler(_, message: Message):
     sender = message.from_user.mention
+
     if random.choice([True, False]):
         await app.send_sticker(message.chat.id, get_random_sticker())
-        await message.reply_text(
-            f"❖ ɢᴏᴏᴅ ɴɪɢʜᴛ ❖ sᴡᴇᴇᴛ ᴅʀᴇᴀᴍs ❖\n\n"
-            f"❍  {sender} 😴 \n\n"
-            f"❖ ɢᴏ ᴛᴏ ➥ sʟᴇᴇᴘ ᴇᴀʀʟʏ"
-        )
-    else:
-        emoji = get_random_emoji()
-        await message.reply_text(
-            f"❖ ɢᴏᴏᴅ ɴɪɢʜᴛ ❖ sᴡᴇᴇᴛ ᴅʀᴇᴀᴍs ❖\n\n"
-            f"❍  {sender} {emoji} \n\n"
-            f"❖ ɢᴏ ᴛᴏ ➥ sʟᴇᴇᴘ ᴇᴀʀʟʏ"
-        )
+
+    await message.reply_text(
+        f"❖ ɢᴏᴏᴅ ᴍᴏʀɴɪɴɢ ❖ ʜᴀᴠᴇ ᴀ ɴɪᴄᴇ ᴅᴀʏ ❖\n\n"
+        f"❍ {sender} {get_morning_emoji()}\n\n"
+        f"❖ sᴛᴀʀᴛ ʏᴏᴜʀ ᴅᴀʏ ➥ ᴡɪᴛʜ ᴀ sᴍɪʟᴇ 😊"
+    )
+
+
+# Good Night
+@app.on_message(filters.command(["gn", "goodnight", "good_night"]))
+async def goodnight_command_handler(_, message: Message):
+    sender = message.from_user.mention
+
+    if random.choice([True, False]):
+        await app.send_sticker(message.chat.id, get_random_sticker())
+
+    await message.reply_text(
+        f"❖ ɢᴏᴏᴅ ɴɪɢʜᴛ ❖ sᴡᴇᴇᴛ ᴅʀᴇᴀᴍs ❖\n\n"
+        f"❍ {sender} {get_night_emoji()}\n\n"
+        f"❖ ɢᴏ ᴛᴏ ➥ sʟᴇᴇᴘ ᴇᴀʀʟʏ"
+    )
