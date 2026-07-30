@@ -6,10 +6,10 @@ from ShrutiMusic import app
 # ------------------ STICKERS ------------------
 
 MORNING_STICKERS = [
-    "CAACAgUAAxkBAAEFywJqaqDVlAAB4--LikTmdBzvXLQwfAADghAAAv5P-Fd7RWzhbK6qfz0E"
-    "CAACAgUAAxkBAAEFywRqaqDxkqtsXjBMbOVn6jU6Jnv0SQAC1xIAAsLb-FdlII0pgKoyJD0E"
-    "CAACAgUAAxkBAAEFywZqaqEKMrvUFPc0BLHy6M7-ZU7eDQACDxMAAm3G-FfhbWLirz0OQj0E"
-    "CAACAgUAAxkBAAEFywhqaqEp38zc-inKk4Jrxc61QS8VJwACNBQAAsqW8FdUQcNjlgZtnD0E"
+    "CAACAgUAAxkBAAEFywJqaqDVlAAB4--LikTmdBzvXLQwfAADghAAAv5P-Fd7RWzhbK6qfz0E",
+    "CAACAgUAAxkBAAEFywRqaqDxkqtsXjBMbOVn6jU6Jnv0SQAC1xIAAsLb-FdlII0pgKoyJD0E",
+    "CAACAgUAAxkBAAEFywZqaqEKMrvUFPc0BLHy6M7-ZU7eDQACDxMAAm3G-FfhbWLirz0OQj0E",
+    "CAACAgUAAxkBAAEFywhqaqEp38zc-inKk4Jrxc61QS8VJwACNBQAAsqW8FdUQcNjlgZtnD0E",
 ]
 
 NIGHT_STICKERS = [
@@ -71,7 +71,7 @@ async def gn_cmd(_, message: Message):
 
 # gm (without /)
 @app.on_message(
-    filters.regex(r"^(?i)(gm|good morning|Gn|Goodmorning|goodmorning)$"))
+    filters.regex(r"^(?i)(gm|good morning|Gm|Goodmorning|goodmorning)$"))
 async def gm_text(_, message: Message):
     await send_morning(message)
 
