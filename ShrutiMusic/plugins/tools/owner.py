@@ -19,14 +19,40 @@ _welcomed_chats = set()
 
 def owner_welcome_text():
     return (
-        f"👑 <b>OWNER HAS ARRIVED!</b>\n"
-        f"━━━━━━━━━━━━━━━━━━\n\n"
-        f"✨ Welcome <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
+        f"<b>👑 ᴏᴡɴᴇʀ ʜᴀs ᴀʀʀɪᴠᴇᴅ</b>\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"✨ <b>ᴡᴇʟᴄᴏᴍᴇ</b>\n"
+        f"👤 <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
         f"🔗 @{OWNER_USERNAME}\n\n"
-        f"🎵 Music • 🤖 AI • ⚡ All Types of Bots\n"
-        f"Group mein owner present hai ❤️"
+        f"<b>🛠️ ᴇxᴘᴇʀᴛɪsᴇ</b>\n"
+        f"🎵 ᴍᴜsɪᴄ ʙᴏᴛs\n"
+        f"🤖 ᴀɪ ʙᴏᴛs\n"
+        f"⚡ ᴜsᴇʀʙᴏᴛs & ᴛᴏᴏʟs\n\n"
+        f"💎 <i>ɢʀᴏᴜᴘ ᴍᴇɪɴ ᴏᴡɴᴇʀ ᴘʀᴇsᴇɴᴛ ʜᴀɪ</i> ❤️"
     )
 
+
+def owner_welcome_buttons():
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "📢 Support Channel",
+                    url=config.SUPPORT_CHANNEL,
+                ),
+                InlineKeyboardButton(
+                    "💬 Support Group",
+                    url=config.SUPPORT_GROUP,
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    "👑 Owner",
+                    url=f"https://t.me/{OWNER_USERNAME}",
+                )
+            ],
+        ]
+    )
 
 @app.on_chat_member_updated()
 async def owner_joined(_, update: ChatMemberUpdated):
