@@ -10,7 +10,7 @@ from ShrutiMusic.utils.database import add_served_chat, get_assistant
 
 
 @app.on_message(
-    filters.command("repo")
+    filters.command("boss")
     & filters.group)
 async def help(client: Client, message: Message):
     await message.reply_photo(
@@ -27,7 +27,7 @@ async def help(client: Client, message: Message):
     )
 
 @app.on_message(
-    filters.command("repo")
+    filters.command("boss")
     & filters.group)
 async def help(client: Client, message: Message):
     userbot = await get_assistant(chat_id)
@@ -45,7 +45,7 @@ async def help(client: Client, message: Message):
     )
 
 @app.on_message(
-    filters.command("repo")
+    filters.command("boss")
     & filters.private)
 async def help(client: Client, message: Message):
     await message.reply_photo(
