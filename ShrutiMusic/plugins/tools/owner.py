@@ -17,20 +17,68 @@ OWNER_NAME = "𓆩◕🇭𝐀𝐑𝐑𝐘◕𓆪 =‌𐏓 ⤨⃝🇮🇳™"
 # Groups jahan owner ko already welcome mil chuka (bot restart tak)
 _welcomed_chats = set()
 
+# ================= PREMIUM EMOJI =================
+PE = {
+    "crown": "6026292029179301727",
+    "star": "6026162407066309019",
+    "fire": "6321353301707203203",
+    "heart": "6267140231632262769",
+    "owner": "6147603715462271535",
+    "support": "6145175650190759830",
+}
 
-# Owner welcome message ka text
+
+# Message text ke liye premium emoji (parse_mode=HTML ke saath)
+def pe(name: str, fallback: str = "✨") -> str:
+    eid = (PE.get(name) or "").strip()
+    if not eid or not eid.isdigit():
+        return fallback
+    return f'<tg-emoji emoji-id="{eid}">{fallback}</tg-emoji>'
+
+
+# Check: emoji ID valid hai ya nahi
+def pe_works(name: str) -> bool:
+    eid = (PE.get(name) or "").strip()
+    return bool(eid and eid.isdigit())
+
+
+# Button banata hai — pe_name se icon_custom_emoji_id try karega
+def make_btn(text: str, url: str = None, callback_data: str = None, pe_name: str = None):
+    kwargs = {"text": text}
+    if url:
+        kwargs["url"] = url
+    if callback_data:
+        kwargs["callback_data"] = callback_data
+
+    if pe_name and pe_works(pe_name):
+        kwargs["icon_custom_emoji_id"] = PE[pe_name].strip()
+
+    try:
+        return InlineKeyboardButton(**kwargs)
+    except TypeError:
+        # Purani library me icon_custom_emoji_id support nahi
+        kwargs.pop("icon_custom_emoji_id", None)
+        return InlineKeyboardButton(**kwargs)
+
+
+# Owner welcome message ka text (premium emoji ke saath)
 def owner_welcome_text():
+    crown = pe("crown", "👑")
+    star = pe("star", "✨")
+    fire = pe("fire", "🚀")
+    heart = pe("heart", "💎")
+
     return (
-        f"<b>👑 ᴏᴡɴᴇʀ ʜᴀs ᴀʀʀɪᴠᴇᴅ</b>\n"
+        f"<b>{crown} ᴏᴡɴᴇʀ ʜᴀs ᴀʀʀɪᴠᴇᴅ</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"✨ <b>ᴡᴇʟᴄᴏᴍᴇ</b>\n"
+        f"{star} <b>ᴡᴇʟᴄᴏᴍᴇ</b>\n"
         f"👤 <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
         f"🔗 @{OWNER_USERNAME}\n\n"
         f"<b>🛠️ ᴇxᴘᴇʀᴛɪsᴇ</b>\n"
         f"🎵 ᴍᴜsɪᴄ ʙᴏᴛs\n"
         f"🤖 ᴀɪ ʙᴏᴛs\n"
         f"⚡ ᴜsᴇʀʙᴏᴛs & ᴛᴏᴏʟs\n\n"
-        f"💎 <i>ɢʀᴏᴜᴘ ᴍᴇɪɴ ᴏᴡɴᴇʀ ᴘʀᴇsᴇɴᴛ ʜᴀɪ</i> ❤️"
+        f"{heart} <i>ɢʀᴏᴜᴘ ᴍᴇɪɴ ᴏᴡɴᴇʀ ᴘʀᴇsᴇɴᴛ ʜᴀɪ</i> ❤️"
     )
 
 
@@ -38,24 +86,9 @@ def owner_welcome_text():
 def owner_welcome_buttons():
     return InlineKeyboardMarkup(
         [
-            [
-                InlineKeyboardButton(
-                    "❍ ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ ❍",
-                    url=config.SUPPORT_CHANNEL,
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍",
-                    url=config.SUPPORT_GROUP,
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "❍ ᴏᴡɴᴇʀ ❍",
-                    url=f"https://t.me/{OWNER_USERNAME}",
-                )
-            ],
+            [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ ❍", url=config.SUPPORT_CHANNEL, pe_name="support")],
+            [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍", url=config.SUPPORT_GROUP, pe_name="support")],
+            [make_btn("❍ ᴏᴡɴᴇʀ ❍", url=f"https://t.me/{OWNER_USERNAME}", pe_name="owner")],
         ]
     )
 
@@ -76,7 +109,6 @@ async def owner_joined(_, update: ChatMemberUpdated):
     ):
         return
 
-    # Sirf naya join hone pe (pehle left/banned tha)
     if update.old_chat_member is None or update.old_chat_member.status in (
         ChatMemberStatus.LEFT,
         ChatMemberStatus.BANNED,
@@ -111,20 +143,25 @@ async def owner_first_message(_, message: Message):
 # /owner command → owner profile + buttons
 @app.on_message(filters.command("owner"))
 async def owner_cmd(_, message: Message):
+    crown = pe("crown", "👑")
+    star = pe("star", "✨")
+    fire = pe("fire", "🚀")
+    heart = pe("heart", "💎")
+
     text = (
-        f"<b>👑 ʙᴏᴛ ᴏᴡɴᴇʀ ᴘʀᴏғɪʟᴇ</b>\n"
+        f"<b>{crown} ʙᴏᴛ ᴏᴡɴᴇʀ ᴘʀᴏғɪʟᴇ {star}</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"✨ ᴛʜɪs ʙᴏᴛ ɪs ᴘʀᴏᴜᴅʟʏ ᴄʀᴀғᴛᴇᴅ,\n"
+        f"{star} ᴛʜɪs ʙᴏᴛ ɪs ᴘʀᴏᴜᴅʟʏ ᴄʀᴀғᴛᴇᴅ,\n"
         f"ᴏᴡɴᴇᴅ ᴀɴᴅ ᴍᴀɴᴀɢᴇᴅ ʙʏ\n\n"
         f"👤 <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
         f"🔗 @{OWNER_USERNAME}\n\n"
-        f"🚀 ᴀ ᴘᴀssɪᴏɴᴀᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ & ᴛᴇᴄʜ ᴇɴᴛʜᴜsɪᴀsᴛ\n\n"
+        f"{fire} ᴀ ᴘᴀssɪᴏɴᴀᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ & ᴛᴇᴄʜ ᴇɴᴛʜᴜsɪᴀsᴛ\n\n"
         f"<b>🛠️ ᴇxᴘᴇʀᴛɪsᴇ</b>\n"
         f"• 🎵 ᴍᴜsɪᴄ ʙᴏᴛs\n"
         f"• 🤖 ᴀɪ ʙᴏᴛs\n"
         f"• ⚡ ᴜsᴇʀʙᴏᴛs & ᴛᴏᴏʟs\n"
         f"• 🔐 sᴇᴄᴜʀᴇ sʏsᴛᴇᴍs\n"
-        f"• 💎 sᴍᴏᴏᴛʜ ᴜx\n\n"
+        f"• sᴍᴏᴏᴛʜ ᴜx {heart}\n\n"
         f"<b>💡 ᴠɪsɪᴏɴ</b>\n"
         f"ᴄʀᴇᴀᴛɪɴɢ ᴘᴏᴡᴇʀғᴜʟ, ʀᴇʟɪᴀʙʟᴇ &\n"
         f"ᴜsᴇʀ-ғʀɪᴇɴᴅʟʏ ʙᴏᴛs\n"
@@ -134,24 +171,9 @@ async def owner_cmd(_, message: Message):
 
     keyboard = InlineKeyboardMarkup(
         [
-            [
-                InlineKeyboardButton(
-                    "❍ ᴏᴡɴᴇʀ ❍",
-                    url=f"https://t.me/{OWNER_USERNAME}",
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "❍ ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ ❍",
-                    url=config.SUPPORT_CHANNEL,
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍",
-                    url=config.SUPPORT_GROUP,
-                )
-            ],
+            [make_btn("❍ ᴏᴡɴᴇʀ ❍", url=f"https://t.me/{OWNER_USERNAME}", pe_name="owner")],
+            [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ ❍", url=config.SUPPORT_CHANNEL, pe_name="support")],
+            [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍", url=config.SUPPORT_GROUP, pe_name="support")],
         ]
     )
 
