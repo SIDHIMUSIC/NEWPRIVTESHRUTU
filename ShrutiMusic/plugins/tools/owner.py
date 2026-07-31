@@ -7,10 +7,12 @@ from pyrogram.types import (
 )
 from pyrogram.enums import ChatMemberStatus
 from ShrutiMusic import app
+import config
 
-OWNER_ID = "8170572505"
+OWNER_ID = 8170572505
 OWNER_USERNAME = "SANATANI_BACCHA"
-OWNERS = "8170572505"
+OWNER_NAME = "𓆩◕🇭𝐀𝐑𝐑𝐘◕𓆪 =‌𐏓 ⤨⃝🇮🇳™"
+
 
 @app.on_chat_member_updated()
 async def owner_joined(_, update: ChatMemberUpdated):
@@ -24,7 +26,6 @@ async def owner_joined(_, update: ChatMemberUpdated):
             ChatMemberStatus.OWNER,
         )
     ):
-        # only when owner newly joins (not already was member)
         if (
             update.old_chat_member is None
             or update.old_chat_member.status in (
@@ -40,22 +41,46 @@ async def owner_joined(_, update: ChatMemberUpdated):
 
 @app.on_message(filters.command("owner"))
 async def owner_cmd(_, message: Message):
-    await message.reply_photo(
-        photo="https://telegra.ph/file/41ec8f174b98e691047f7.png",
-        caption="👑 **🍁𝐂𝐋𝐈𝐂𝐊🥰𝐁𝐄𝐋𝐎𝐖💝𝐁𝐔𝐓𝐓𝐎𝐍✨𝐓𝐎🙊𝐆𝐄𝐓🌱𝐎𝐖𝐍𝐄𝐑🍁**",
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton(
-                        "👑 Owner",
-                        url=f"https://t.me/{OWNER_USERNAME}",
-                    )
-                ]
-            ]
-        ),
+    text = (
+        "<b>👑 ʙᴏᴛ ᴏᴡɴᴇʀ ᴘʀᴏғɪʟᴇ✨</b>\n"
+        "━━━━━━━━━━━━━━━━━━\n\n"
+        "✨ ᴛʜɪs ɪɴᴛᴇʟʟɪɢᴇɴᴛ ᴀɪ ʙᴏᴛ ɪs ᴘʀᴏᴜᴅʟʏ ᴄʀᴀғᴛᴇᴅ,\n"
+        "ᴏᴡɴᴇᴅ ᴀɴᴅ ᴍᴀɴᴀɢᴇᴅ ʙʏ\n\n"
+        f"👤 <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
+        f"🔗 @{OWNER_USERNAME}\n\n"
+        "🚀 ᴀ ᴘᴀssɪᴏɴᴀᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ & ᴛᴇᴄʜ ᴇɴᴛʜᴜsɪᴀsᴛ\n"
+        "• sᴍᴀʀᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴏɴ 🤖\n"
+        "• sᴇᴄᴜʀᴇ sʏsᴛᴇᴍs 🔐\n"
+        "• sᴍᴏᴏᴛʜ ᴜsᴇʀ ᴇxᴘᴇʀɪᴇɴᴄᴇ 💎\n\n"
+        "💡 ᴠɪsɪᴏɴ\n"
+        "ᴄʀᴇᴀᴛɪɴɢ ᴘᴏᴡᴇʀғᴜʟ, ʀᴇʟɪᴀʙʟᴇ ᴀɴᴅ\n"
+        "ᴜsᴇʀ-ғʀɪᴇɴᴅʟʏ ᴀɪ ʙᴏᴛs\n"
+        "ᴛʜᴀᴛ ᴍᴀᴋᴇ ᴛᴇʟᴇɢʀᴀᴍ sᴍᴀʀᴛᴇʀ ⚡\n\n"
+        "👇 ᴄᴏɴɴᴇᴄᴛ & sᴛᴀʏ ᴜᴘᴅᴀᴛᴇᴅ"
     )
 
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "❍ 𝐎ᴡɴᴇʀ ❍",
+                    url=f"https://t.me/{OWNER_USERNAME}",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "❍ Support Channel ❍",
+                    url=config.SUPPORT_CHANNEL,
+                )
+            ],
+        ]
+    )
 
+    await message.reply_text(
+        text,
+        reply_markup=keyboard,
+        disable_web_page_preview=True,
+    )
 
 
 
@@ -72,43 +97,3 @@ async def bot_check(_, message):
 
 
 
-import asyncio
-import time
-
-@app.on_message(filters.command("gadd") & filters.user(int(OWNERS)))
-async def add_all(client, message):
-    command_parts = message.text.split(" ")
-    if len(command_parts) != 2:
-        await message.reply("**⚠️ ɪɴᴠᴀʟɪᴅ ᴄᴏᴍᴍᴀɴᴅ ғᴏʀᴍᴀᴛ. ᴘʟᴇᴀsᴇ ᴜsᴇ ʟɪᴋᴇ » `/gadd @ll_RADHA_MUSICBOT`**")
-        return
-    
-    bot_username = command_parts[1]
-    try:
-        userbot = await get_assistant(message.chat.id)
-        bot = await app.get_users(bot_username)
-        app_id = bot.id
-        done = 0
-        failed = 0
-        lol = await message.reply("🔄 **ᴀᴅᴅɪɴɢ ɢɪᴠᴇɴ ʙᴏᴛ ɪɴ ᴀʟʟ ᴄʜᴀᴛs!**")
-        
-        async for dialog in userbot.get_dialogs():
-            if dialog.chat.id == -1001645282995:
-                continue
-            try:
-                await userbot.add_chat_members(dialog.chat.id, app_id)
-                done += 1
-                await lol.edit(
-                    f"**🔂 ᴀᴅᴅɪɴɢ {bot_username}**\n\n**➥ ᴀᴅᴅᴇᴅ ɪɴ {done} ᴄʜᴀᴛs ✅**\n**➥ ғᴀɪʟᴇᴅ ɪɴ {failed} ᴄʜᴀᴛs ❌**\n\n**➲ ᴀᴅᴅᴇᴅ ʙʏ»** @{userbot.username}"
-                )
-            except Exception as e:
-                failed += 1
-                await lol.edit(
-                    f"**🔂 ᴀᴅᴅɪɴɢ {bot_username}**\n\n**➥ ᴀᴅᴅᴇᴅ ɪɴ {done} ᴄʜᴀᴛs ✅**\n**➥ ғᴀɪʟᴇᴅ ɪɴ {failed} ᴄʜᴀᴛs ❌**\n\n**➲ ᴀᴅᴅɪɴɢ ʙʏ»** @{userbot.username}"
-                )
-            await asyncio.sleep(3)  # Adjust sleep time based on rate limits
-        
-        await lol.edit(
-            f"**➻ {bot_username} ʙᴏᴛ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ🎉**\n\n**➥ ᴀᴅᴅᴇᴅ ɪɴ {done} ᴄʜᴀᴛs ✅**\n**➥ ғᴀɪʟᴇᴅ ɪɴ {failed} ᴄʜᴀᴛs ❌**\n\n**➲ ᴀᴅᴅᴇᴅ ʙʏ»** @{userbot.username}"
-        )
-    except Exception as e:
-        await message.reply(f"Error: {str(e)}")
