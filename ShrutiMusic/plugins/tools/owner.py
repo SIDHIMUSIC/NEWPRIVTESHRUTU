@@ -5,7 +5,7 @@ from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
 )
-from pyrogram.enums import ChatMemberStatus
+from pyrogram.enums import ChatMemberStatus, ParseMode
 from ShrutiMusic import app
 from ShrutiMusic.utils.database import add_served_chat
 import config
@@ -81,7 +81,7 @@ async def owner_joined(_, update: ChatMemberUpdated):
             owner_welcome_text(),
             reply_markup=owner_welcome_buttons(),
             disable_web_page_preview=True,
-            parse_mode="HTML",
+            parse_mode=ParseMode.HTML,
         )
 
 
@@ -96,7 +96,7 @@ async def owner_first_message(_, message: Message):
         owner_welcome_text(),
         reply_markup=owner_welcome_buttons(),
         disable_web_page_preview=True,
-        parse_mode="HTML",
+        parse_mode=ParseMode.HTML,
     )
 
 
@@ -148,7 +148,7 @@ async def owner_cmd(_, message: Message):
         text,
         reply_markup=keyboard,
         disable_web_page_preview=True,
-        parse_mode="HTML",
+        parse_mode=ParseMode.HTML,
     )
 
 
