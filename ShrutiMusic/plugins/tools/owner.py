@@ -28,12 +28,12 @@ PE = {
 }
 
 
-# Message text ke liye premium emoji (parse_mode=HTML ke saath)
+# Message text ke liye premium emoji (Pyrogram format)
 def pe(name: str, fallback: str = "✨") -> str:
     eid = (PE.get(name) or "").strip()
     if not eid or not eid.isdigit():
         return fallback
-    return f'<tg-emoji emoji-id="{eid}">{fallback}</tg-emoji>'
+    return f'<emoji id="{eid}">{fallback}</emoji>'
 
 
 # Check: emoji ID valid hai ya nahi
@@ -56,16 +56,14 @@ def make_btn(text: str, url: str = None, callback_data: str = None, pe_name: str
     try:
         return InlineKeyboardButton(**kwargs)
     except TypeError:
-        # Purani library me icon_custom_emoji_id support nahi
         kwargs.pop("icon_custom_emoji_id", None)
         return InlineKeyboardButton(**kwargs)
 
 
-# Owner welcome message ka text (premium emoji ke saath)
+# Owner welcome message ka text
 def owner_welcome_text():
     crown = pe("crown", "👑")
     star = pe("star", "✨")
-    fire = pe("fire", "🚀")
     heart = pe("heart", "💎")
 
     return (
@@ -93,7 +91,7 @@ def owner_welcome_buttons():
     )
 
 
-# Jab owner group mein naya join kare → welcome message
+# Jab owner group mein naya join kare → welcome
 @app.on_chat_member_updated()
 async def owner_joined(_, update: ChatMemberUpdated):
     if not (update.new_chat_member and update.new_chat_member.user):
