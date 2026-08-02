@@ -24,7 +24,22 @@ from config import BANNED_USERS
 from strings import get_string
 
 
-@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
+def start_text(user_name: str, bot_mention: str) -> str:
+    e1 = '<emoji id="6026292029179301727">✧</emoji>'
+    e2 = '<emoji id="6026162407066309019">✨</emoji>'
+    e3 = '<emoji id="5413702412983389863">✦</emoji>'
+    e4 = '<emoji id="5260293847435411705">🎧</emoji>'
+    return (
+        f"{e1} <b>ʜᴇʏ</b> <b>{user_name}</b> {e2}\n\n"
+        f"{e3} <b>ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ</b> {bot_mention} ♪ [ 🇮🇳 ]\n\n"
+        f"<b>➤ ʏᴏᴜʀ ꜱᴍᴀʀᴛ ᴍᴜꜱɪᴄ ᴄᴏᴍᴘᴀɴɪᴏɴ ꜰᴏʀ ᴛᴇʟᴇɢʀᴀᴍ ᴠᴄ.</b>\n\n"
+        f"{e3} <b>ꜰᴇᴀᴛᴜʀᴇꜱ :</b> <b>ꜱᴍᴏᴏᴛʜ ᴘʟᴀʏʙᴀᴄᴋ • ʜᴅ ꜱᴏᴜɴᴅ • ᴢᴇʀᴏ ʟᴀɢ</b> {e4}\n\n"
+        f"{e3} <b>ꜱᴏᴜʀᴄᴇꜱ :</b> <b>ʏᴏᴜᴛᴜʙᴇ • ꜱᴘᴏᴛɪꜰʏ • ᴀᴘᴘʟᴇ • ꜱᴀᴀᴠɴ</b>\n\n"
+        f"<b>➥ ᴛᴀᴘ <a href=\"https://t.me/PRAGYA_ROBOT?start=help\">ʜᴇʟᴘ</a> ᴛᴏ ꜱᴇᴇ ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅꜱ.</b>"
+    )
+
+
+@app.on_message(filters.command(["start"]) & filters.private & \~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
     await add_served_user(message.from_user.id)
@@ -88,10 +103,9 @@ async def start_pm(client, message: Message, _):
                 )
         if name == "start":
             out = private_panel(_)
-            UP, CPU, RAM, DISK = await bot_sys_stats()
             await message.reply_photo(photo=config.START_IMG_URL)
             await message.reply_text(
-                _["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
+                start_text(message.from_user.first_name, app.mention),
                 reply_markup=InlineKeyboardMarkup(out),
                 parse_mode=ParseMode.HTML,
             )
@@ -103,10 +117,9 @@ async def start_pm(client, message: Message, _):
                 )
     else:
         out = private_panel(_)
-        UP, CPU, RAM, DISK = await bot_sys_stats()
         await message.reply_photo(photo=config.START_IMG_URL)
         await message.reply_text(
-            _["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
+            start_text(message.from_user.first_name, app.mention),
             reply_markup=InlineKeyboardMarkup(out),
             parse_mode=ParseMode.HTML,
         )
@@ -118,7 +131,7 @@ async def start_pm(client, message: Message, _):
             )
 
 
-@app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
+@app.on_message(filters.command(["start"]) & filters.group & \~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
