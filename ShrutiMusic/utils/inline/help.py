@@ -9,6 +9,7 @@ PE = {
     "support": "5276032951342088188",
     "back": "5213358684024877471",
     "help": "6082592230021795516",
+    "back2": "6267119710278522544",
 }
 
 
@@ -158,7 +159,7 @@ def help_pannel_page4(_, START: Union[bool, int] = None):
                     callback_data="settingsback_helper" if START else "close",
                     pe_name="back",
                 ),
-                btn("⏭", callback_data="help_page_1", pe_name="back"),
+                btn("⏭", callback_data="help_page_1", pe_name="back2"),
             ],
         ]
     )
