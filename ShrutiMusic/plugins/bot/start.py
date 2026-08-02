@@ -24,25 +24,6 @@ from config import BANNED_USERS
 from strings import get_string
 
 
-def start_text(user_name: str) -> str:
-    safe_name = "".join(
-        c for c in (user_name or "User") if c.isprintable()
-    )[:30] or "User"
-
-    return (
-        f'<emoji id="5233510996995228076">✧</emoji> <b>ʜᴇʏ</b> <b>{safe_name}</b> '
-        f'<emoji id="6291916484918648855">💀</emoji>\n\n'
-        f'<emoji id="6336813264122419000">❖</emoji> <b>ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ</b> <b>Pragya Music</b> ♪ [ 🇮🇳 ]\n\n'
-        f'<b>➤ ʏᴏᴜʀ ꜱᴍᴀʀᴛ ᴍᴜꜱɪᴄ ᴄᴏᴍᴘᴀɴɪᴏɴ ꜰᴏʀ ᴛᴇʟᴇɢʀᴀᴍ ᴠᴄ.</b>\n\n'
-        f'<emoji id="5413702412983389863">✦</emoji> <b>ꜰᴇᴀᴛᴜʀᴇꜱ :</b> '
-        f'<b>ꜱᴍᴏᴏᴛʜ ᴘʟᴀʏʙᴀᴄᴋ • ʜᴅ ꜱᴏᴜɴᴅ • ᴢᴇʀᴏ ʟᴀɢ</b> '
-        f'<emoji id="5260293847435411705">🎧</emoji>\n\n'
-        f'<emoji id="5416081784641168838">✦</emoji> <b>ꜱᴏᴜʀᴄᴇꜱ :</b> '
-        f'<b>ʏᴏᴜᴛᴜʙᴇ • ꜱᴘᴏᴛɪꜰʏ • ᴀᴘᴘʟᴇ • ꜱᴀᴀᴠɴ</b>\n\n'
-        f'<b>➥ ᴛᴀᴘ ʜᴇʟᴘ ᴛᴏ ꜱᴇᴇ ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅꜱ.</b>'
-    )
-
-
 @app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
@@ -51,9 +32,9 @@ async def start_pm(client, message: Message, _):
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
             keyboard = help_pannel_page1(_)
-            await message.reply_photo(photo=config.START_IMG_URL)
-            return await message.reply_text(
-                _["help_1"].format(config.SUPPORT_GROUP),
+            return await message.reply_photo(
+                photo=config.START_IMG_URL,
+                caption=_["help_1"].format(config.SUPPORT_GROUP),
                 reply_markup=keyboard,
                 parse_mode=ParseMode.HTML,
             )
@@ -107,9 +88,10 @@ async def start_pm(client, message: Message, _):
                 )
         if name == "start":
             out = private_panel(_)
-            await message.reply_photo(photo=config.START_IMG_URL)
-            await message.reply_text(
-                start_text(message.from_user.first_name or "User"),
+            UP, CPU, RAM, DISK = await bot_sys_stats()
+            await message.reply_photo(
+                photo=config.START_IMG_URL,
+                caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
                 reply_markup=InlineKeyboardMarkup(out),
                 parse_mode=ParseMode.HTML,
             )
@@ -121,9 +103,10 @@ async def start_pm(client, message: Message, _):
                 )
     else:
         out = private_panel(_)
-        await message.reply_photo(photo=config.START_IMG_URL)
-        await message.reply_text(
-            start_text(message.from_user.first_name or "User"),
+        UP, CPU, RAM, DISK = await bot_sys_stats()
+        await message.reply_photo(
+            photo=config.START_IMG_URL,
+            caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
             reply_markup=InlineKeyboardMarkup(out),
             parse_mode=ParseMode.HTML,
         )
