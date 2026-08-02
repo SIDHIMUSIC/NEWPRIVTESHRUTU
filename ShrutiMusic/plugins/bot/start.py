@@ -25,22 +25,15 @@ from strings import get_string
 
 
 def start_text(user_name: str) -> str:
-    e1 = '<emoji id="6026292029179301727">✧</emoji>'
-    e2 = '<emoji id="6026162407066309019">✨</emoji>'
-    e3 = '<emoji id="5413702412983389863">✦</emoji>'
-    e4 = '<emoji id="5260293847435411705">🎧</emoji>'
-
     safe_name = "".join(
-        c for c in (user_name or "User") if c.isprintable() and ord(c) < 0x3000
+        c for c in (user_name or "User") if c.isprintable()
     )[:30] or "User"
-
     return (
-        f"{e1} <b>ʜᴇʏ</b> <b>{safe_name}</b> {e2}\n\n"
-        f"{e3} <b>ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ</b> <b>Pragya Music</b> ♪ [ 🇮🇳 ]\n\n"
-        f"<b>➤ ʏᴏᴜʀ ꜱᴍᴀʀᴛ ᴍᴜꜱɪᴄ ᴄᴏᴍᴘᴀɴɪᴏɴ ꜰᴏʀ ᴛᴇʟᴇɢʀᴀᴍ ᴠᴄ.</b>\n\n"
-        f"{e3} <b>ꜰᴇᴀᴛᴜʀᴇꜱ :</b> <b>ꜱᴍᴏᴏᴛʜ ᴘʟᴀʏʙᴀᴄᴋ • ʜᴅ ꜱᴏᴜɴᴅ • ᴢᴇʀᴏ ʟᴀɢ</b> {e4}\n\n"
-        f"{e3} <b>ꜱᴏᴜʀᴄᴇꜱ :</b> <b>ʏᴏᴜᴛᴜʙᴇ • ꜱᴘᴏᴛɪꜰʏ • ᴀᴘᴘʟᴇ • ꜱᴀᴀᴠɴ</b>\n\n"
-        f"<b>➥ ᴛᴀᴘ ʜᴇʟᴘ ᴛᴏ ꜱᴇᴇ ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅꜱ.</b>"
+        f"✧ <b>HEY</b> <b>{safe_name}</b> ✨\n\n"
+        f"✦ <b>WELCOME TO</b> <b>Pragya Music</b> ♪ [ 🇮🇳 ]\n\n"
+        f"<b>Your smart music companion for Telegram VC.</b>\n\n"
+        f"✦ <b>FEATURES:</b> Smooth Playback • HD Sound • Zero Lag 🎧\n\n"
+        f"✦ <b>SOURCES:</b> YouTube • Spotify • Apple • Saavn"
     )
 
 
