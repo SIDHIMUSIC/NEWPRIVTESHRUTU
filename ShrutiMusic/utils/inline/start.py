@@ -9,9 +9,10 @@ PE = {
     "channel": "6145175650190759830",
     "add": "6026292029179301727",
     "comman": "6118209143972040877",
-    "network": "6026162407066309019",
+    "network": "5375177250553487549",
     "source": "5416081784641168838",
     "back": "5215260113291455937",
+    "pfp": "5256143829672672750",
     # Apne custom
     "igram": "4990082283701535678",
     "ghub": "5933540612694347912",
@@ -57,7 +58,7 @@ def private_panel(_):
         ],
         [
             btn(_["S_B_11"], callback_data="about_page", pe_name="network"),
-            btn(_["S_B_12"], callback_data="owner_page", pe_name="owner"),
+            btn(_["S_B_12"], callback_data="owner_page", pe_name="pfp"),
         ],
         [
             btn(_["E_X_1"], callback_data="fork_repo", pe_name="source"),
@@ -80,16 +81,15 @@ def about_panel(_):
         ],
     ]
 
-
 def owner_panel(_):
     return [
         [
-            InlineKeyboardButton(text=_["S_H_1"], url=config.INSTAGRAM, pe_name="igram"),
-            InlineKeyboardButton(text=_["S_H_2"], url=config.YOUTUBE, pe_name="ytune"),
+            btn(_["S_H_1"], url=config.INSTAGRAM, pe_name="igram"),
+            btn(_["S_H_2"], url=config.YOUTUBE, pe_name="ytune"),
         ],
         [
-            InlineKeyboardButton(text=_["S_H_3"], url=config.GITHUB, pe_name="ghub"),
-            InlineKeyboardButton(text=_["S_H_4"], url=config.DONATE, pe_name="dont"),
+            btn(_["S_H_3"], url=config.GITHUB, pe_name="ghub"),
+            btn(_["S_H_4"], url=config.DONATE, pe_name="dont"),
         ],
         [
             btn(_["BACK_BUTTON"], callback_data="settingsback_helper", pe_name="back"),
