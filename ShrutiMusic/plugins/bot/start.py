@@ -1,3 +1,4 @@
+
 import time
 
 from pyrogram import filters
@@ -9,12 +10,12 @@ from ShrutiMusic import app
 from ShrutiMusic.misc import _boot_
 from ShrutiMusic.plugins.sudo.sudoers import sudoers_list
 from ShrutiMusic.utils.database import (
-    add_served_chat,
-    add_served_user,
-    blacklisted_chats,
-    get_lang,
-    is_banned_user,
-    is_on_off,
+add_served_chat,
+add_served_user,
+blacklisted_chats,
+get_lang,
+is_banned_user,
+is_on_off,
 )
 from ShrutiMusic.utils import bot_sys_stats
 from ShrutiMusic.utils.decorators.language import LanguageStart
@@ -24,154 +25,171 @@ from config import BANNED_USERS
 from strings import get_string
 
 
+def start_text(user_name: str) -> str:
+safe_name = "".join(
+c for c in (user_name or "User") if c.isprintable()
+)[:30] or "User"
+
+return (
+f'<emoji id="5233510996995228076">✧</emoji> <b>ʜᴇʏ</b> <b>{safe_name}</b> '
+f'<emoji id="6026162407066309019">✨</emoji>\n\n'
+f'<emoji id="6336813264122419000">❖</emoji> <b>ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ</b> <b>Pragya Music</b> ♪ [ 🇮🇳 ]\n\n'
+f'<b>➤ ʏᴏᴜʀ ꜱᴍᴀʀᴛ ᴍᴜꜱɪᴄ ᴄᴏᴍᴘᴀɴɪᴏɴ ꜰᴏʀ ᴛᴇʟᴇɢʀᴀᴍ ᴠᴄ.</b>\n\n'
+f'<emoji id="5413702412983389863">✦</emoji> <b>ꜰᴇᴀᴛᴜʀᴇꜱ :</b> '
+f'<b>ꜱᴍᴏᴏᴛʜ ᴘʟᴀʏʙᴀᴄᴋ • ʜᴅ ꜱᴏᴜɴᴅ • ᴢᴇʀᴏ ʟᴀɢ</b> '
+f'<emoji id="5260293847435411705">🎧</emoji>\n\n'
+f'<emoji id="5416081784641168838">✦</emoji> <b>ꜱᴏᴜʀᴄᴇꜱ :</b> '
+f'<b>ʏᴏᴜᴛᴜʙᴇ • ꜱᴘᴏᴛɪꜰʏ • ᴀᴘᴘʟᴇ • ꜱᴀᴀᴠɴ</b>\n\n'
+f'<b>➥ ᴛᴀᴘ ʜᴇʟᴘ ᴛᴏ ꜱᴇᴇ ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅꜱ.</b>'
+)
+
+
 @app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
-    await add_served_user(message.from_user.id)
-    if len(message.text.split()) > 1:
-        name = message.text.split(None, 1)[1]
-        if name[0:4] == "help":
-            keyboard = help_pannel_page1(_)
-            return await message.reply_photo(
-                photo=config.START_IMG_URL,
-                caption=_["help_1"].format(config.SUPPORT_GROUP),
-                reply_markup=keyboard,
-                parse_mode=ParseMode.HTML,
-            )
-        if name[0:3] == "sud":
-            await sudoers_list(client=client, message=message, _=_)
-            if await is_on_off(2):
-                return await app.send_message(
-                    chat_id=config.LOG_GROUP_ID,
-                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
-                    parse_mode=ParseMode.HTML,
-                )
-            return
-        if name[0:3] == "inf":
-            m = await message.reply_text("🔎")
-            query = (str(name)).replace("info_", "", 1)
-            query = f"https://www.youtube.com/watch?v={query}"
-            results = VideosSearch(query, limit=1)
-            for result in (await results.next())["result"]:
-                title = result["title"]
-                duration = result["duration"]
-                views = result["viewCount"]["short"]
-                thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-                channellink = result["channel"]["link"]
-                channel = result["channel"]["name"]
-                link = result["link"]
-                published = result["publishedTime"]
-            searched_text = _["start_6"].format(
-                title, duration, views, published, channellink, channel, app.mention
-            )
-            key = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(text=_["S_B_8"], url=link),
-                        InlineKeyboardButton(text=_["S_B_9"], url=config.SUPPORT_GROUP),
-                    ],
-                ]
-            )
-            await m.delete()
-            await app.send_photo(
-                chat_id=message.chat.id,
-                photo=thumbnail,
-                caption=searched_text,
-                reply_markup=key,
-                parse_mode=ParseMode.HTML,
-            )
-            if await is_on_off(2):
-                return await app.send_message(
-                    chat_id=config.LOG_GROUP_ID,
-                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
-                    parse_mode=ParseMode.HTML,
-                )
-        if name == "start":
-            out = private_panel(_)
-            UP, CPU, RAM, DISK = await bot_sys_stats()
-            await message.reply_photo(
-                photo=config.START_IMG_URL,
-                caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
-                reply_markup=InlineKeyboardMarkup(out),
-                parse_mode=ParseMode.HTML,
-            )
-            if await is_on_off(2):
-                return await app.send_message(
-                    chat_id=config.LOG_GROUP_ID,
-                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
-                    parse_mode=ParseMode.HTML,
-                )
-    else:
-        out = private_panel(_)
-        UP, CPU, RAM, DISK = await bot_sys_stats()
-        await message.reply_photo(
-            photo=config.START_IMG_URL,
-            caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
-            reply_markup=InlineKeyboardMarkup(out),
-            parse_mode=ParseMode.HTML,
-        )
-        if await is_on_off(2):
-            return await app.send_message(
-                chat_id=config.LOG_GROUP_ID,
-                text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
-                parse_mode=ParseMode.HTML,
-            )
+await add_served_user(message.from_user.id)
+if len(message.text.split()) > 1:
+name = message.text.split(None, 1)[1]
+if name[0:4] == "help":
+keyboard = help_pannel_page1(_)
+await message.reply_photo(photo=config.START_IMG_URL)
+return await message.reply_text(
+_["help_1"].format(config.SUPPORT_GROUP),
+reply_markup=keyboard,
+parse_mode=ParseMode.HTML,
+)
+if name[0:3] == "sud":
+await sudoers_list(client=client, message=message, _=_)
+if await is_on_off(2):
+return await app.send_message(
+chat_id=config.LOG_GROUP_ID,
+text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+parse_mode=ParseMode.HTML,
+)
+return
+if name[0:3] == "inf":
+m = await message.reply_text("🔎")
+query = (str(name)).replace("info_", "", 1)
+query = f"https://www.youtube.com/watch?v={query}"
+results = VideosSearch(query, limit=1)
+for result in (await results.next())["result"]:
+title = result["title"]
+duration = result["duration"]
+views = result["viewCount"]["short"]
+thumbnail = result["thumbnails"][0]["url"].split("?")[0]
+channellink = result["channel"]["link"]
+channel = result["channel"]["name"]
+link = result["link"]
+published = result["publishedTime"]
+searched_text = _["start_6"].format(
+title, duration, views, published, channellink, channel, app.mention
+)
+key = InlineKeyboardMarkup(
+[
+[
+InlineKeyboardButton(text=_["S_B_8"], url=link),
+InlineKeyboardButton(text=_["S_B_9"], url=config.SUPPORT_GROUP),
+],
+]
+)
+await m.delete()
+await app.send_photo(
+chat_id=message.chat.id,
+photo=thumbnail,
+caption=searched_text,
+reply_markup=key,
+parse_mode=ParseMode.HTML,
+)
+if await is_on_off(2):
+return await app.send_message(
+chat_id=config.LOG_GROUP_ID,
+text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+parse_mode=ParseMode.HTML,
+)
+if name == "start":
+out = private_panel(_)
+await message.reply_photo(photo=config.START_IMG_URL)
+await message.reply_text(
+start_text(message.from_user.first_name or "User"),
+reply_markup=InlineKeyboardMarkup(out),
+parse_mode=ParseMode.HTML,
+)
+if await is_on_off(2):
+return await app.send_message(
+chat_id=config.LOG_GROUP_ID,
+text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+parse_mode=ParseMode.HTML,
+)
+else:
+out = private_panel(_)
+await message.reply_photo(photo=config.START_IMG_URL)
+await message.reply_text(
+start_text(message.from_user.first_name or "User"),
+reply_markup=InlineKeyboardMarkup(out),
+parse_mode=ParseMode.HTML,
+)
+if await is_on_off(2):
+return await app.send_message(
+chat_id=config.LOG_GROUP_ID,
+text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+parse_mode=ParseMode.HTML,
+)
 
 
 @app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
-    out = start_panel(_)
-    uptime = int(time.time() - _boot_)
-    await message.reply_photo(
-        photo=config.START_IMG_URL,
-        caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
-        reply_markup=InlineKeyboardMarkup(out),
-        parse_mode=ParseMode.HTML,
-    )
-    return await add_served_chat(message.chat.id)
+out = start_panel(_)
+uptime = int(time.time() - _boot_)
+await message.reply_photo(
+photo=config.START_IMG_URL,
+caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
+reply_markup=InlineKeyboardMarkup(out),
+parse_mode=ParseMode.HTML,
+)
+return await add_served_chat(message.chat.id)
 
 
 @app.on_message(filters.new_chat_members, group=-1)
 async def welcome(client, message: Message):
-    for member in message.new_chat_members:
-        try:
-            language = await get_lang(message.chat.id)
-            _ = get_string(language)
-            if await is_banned_user(member.id):
-                try:
-                    await message.chat.ban_member(member.id)
-                except:
-                    pass
-            if member.id == app.id:
-                if message.chat.type != ChatType.SUPERGROUP:
-                    await message.reply_text(_["start_4"])
-                    return await app.leave_chat(message.chat.id)
-                if message.chat.id in await blacklisted_chats():
-                    await message.reply_text(
-                        _["start_5"].format(
-                            app.mention,
-                            f"https://t.me/{app.username}?start=sudolist",
-                            config.SUPPORT_GROUP,
-                        ),
-                        disable_web_page_preview=True,
-                        parse_mode=ParseMode.HTML,
-                    )
-                    return await app.leave_chat(message.chat.id)
+for member in message.new_chat_members:
+try:
+language = await get_lang(message.chat.id)
+_ = get_string(language)
+if await is_banned_user(member.id):
+try:
+await message.chat.ban_member(member.id)
+except:
+pass
+if member.id == app.id:
+if message.chat.type != ChatType.SUPERGROUP:
+await message.reply_text(_["start_4"])
+return await app.leave_chat(message.chat.id)
+if message.chat.id in await blacklisted_chats():
+await message.reply_text(
+_["start_5"].format(
+app.mention,
+f"https://t.me/{app.username}?start=sudolist",
+config.SUPPORT_GROUP,
+),
+disable_web_page_preview=True,
+parse_mode=ParseMode.HTML,
+)
+return await app.leave_chat(message.chat.id)
 
-                out = start_panel(_)
-                await message.reply_photo(
-                    photo=config.START_IMG_URL,
-                    caption=_["start_3"].format(
-                        message.from_user.first_name,
-                        app.mention,
-                        message.chat.title,
-                        app.mention,
-                    ),
-                    reply_markup=InlineKeyboardMarkup(out),
-                    parse_mode=ParseMode.HTML,
-                )
-                await add_served_chat(message.chat.id)
-                await message.stop_propagation()
-        except Exception as ex:
-            print(ex)
+out = start_panel(_)
+await message.reply_photo(
+photo=config.START_IMG_URL,
+caption=_["start_3"].format(
+message.from_user.first_name,
+app.mention,
+message.chat.title,
+app.mention,
+),
+reply_markup=InlineKeyboardMarkup(out),
+parse_mode=ParseMode.HTML,
+)
+await add_served_chat(message.chat.id)
+await message.stop_propagation()
+except Exception as ex:
+print(ex)
