@@ -10,6 +10,7 @@ PE = {
     "back": "5213358684024877471",
     "help": "6082592230021795516",
     "back2": "6267119710278522544",
+    "home": "5873147866364514353"'
 }
 
 
@@ -56,7 +57,7 @@ def help_pannel_page1(_, START: Union[bool, int] = None):
                     callback_data="settingsback_helper" if START else "close",
                     pe_name="back",
                 ),
-                btn("⏭", callback_data="help_page_2", pe_name="back"),
+                btn("⏭", callback_data="help_page_2", pe_name="back2"),
             ],
         ]
     )
@@ -90,7 +91,7 @@ def help_pannel_page2(_, START: Union[bool, int] = None):
                     callback_data="settingsback_helper" if START else "close",
                     pe_name="back",
                 ),
-                btn("⏭", callback_data="help_page_3", pe_name="back"),
+                btn("⏭", callback_data="help_page_3", pe_name="back2"),
             ],
         ]
     )
@@ -124,7 +125,7 @@ def help_pannel_page3(_, START: Union[bool, int] = None):
                     callback_data="settingsback_helper" if START else "close",
                     pe_name="back",
                 ),
-                btn("⏭", callback_data="help_page_4", pe_name="back"),
+                btn("⏭", callback_data="help_page_4", pe_name="back2"),
             ],
         ]
     )
@@ -169,7 +170,7 @@ def help_back_markup(_, page: int = 1):
     return InlineKeyboardMarkup(
         [
             [
-                btn(_["BACK_BUTTON"], callback_data=f"help_page_{page}", pe_name="back"),
+                btn(_["BACK_BUTTON"], callback_data=f"help_page_{page}", pe_name="home"),
             ]
         ]
     )
