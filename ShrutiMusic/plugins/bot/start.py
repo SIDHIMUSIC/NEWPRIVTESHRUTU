@@ -39,7 +39,7 @@ def start_text(user_name: str, bot_mention: str) -> str:
     )
 
 
-@app.on_message(filters.command(["start"]) & filters.private & \~BANNED_USERS)
+@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
     await add_served_user(message.from_user.id)
@@ -131,7 +131,7 @@ async def start_pm(client, message: Message, _):
             )
 
 
-@app.on_message(filters.command(["start"]) & filters.group & \~BANNED_USERS)
+@app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
