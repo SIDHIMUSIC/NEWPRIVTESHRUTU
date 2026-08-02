@@ -1,7 +1,7 @@
 {
-  "name": "Shruti Music",
+  "name": "PRAGYA Music",
   "description": "A Telegram Music Player Bot, written in Python with Pyrogram and Py-Tgcalls.",
-  "logo": "https://files.catbox.moe/v7hio8.jpg",
+  "logo": "https://graph.org/file/49ab4d29a28742ccf4745-048eef7a3dda4af899.jpg",
   "keywords": [
     "python3",
     "telegram",
@@ -34,22 +34,22 @@
     },
     "MONGO_DB_URI": {
       "description": "Get a mongodb url from https://cloud.mongodb.com.",
-      "value": "mongodb+srv://pusers:nycreation@nycreation.pd4klp1.mongodb.net/?retryWrites=true&w=majority&appName=NYCREATION",
+      "value": "",
       "required": true
     },
     "OWNER_ID": {
       "description": "The user id of user whom you would like to add as OWNER.",
-      "value": "7574330905",
+      "value": "8170572505",
       "required": true
     },
     "BOT_USERNAME": {
       "description": "The username of your bot (without @)",
-      "value": "ShrutixMusicBot",
+      "value": "PRAGYA_ROBOT",
       "required": true
     },
     "UPSTREAM_REPO": {
       "description": "URL of your GitHub repository",
-      "value": "https://github.com/NoxxOP/ShrutiMusic",
+      "value": "https://github.com/SIDHIMUSIC/ShrutiMusic",
       "required": false
     },
     "STRING_SESSION": {
@@ -79,37 +79,37 @@
     },
     "SUPPORT_GROUP": {
       "description": "Your support group link",
-      "value": "https://t.me/ShrutiSupportChat",
+      "value": "https://t.me/SANATANI_BACHA",
       "required": false
     },
     "SUPPORT_CHANNEL": {
       "description": "Your support channel link",
-      "value": "https://t.me/ShrutiBots",
+      "value": "https://t.me/HARRYASHU",
       "required": false
     },
     "INSTAGRAM": {
       "description": "Your Instagram profile link or Any Link",
-      "value": "https://instagram.com/yaduwanshi_nand",
+      "value": "https://instagram.com/tum_jaha_hum_wahi",
       "required": false
     },
     "YOUTUBE": {
       "description": "Your YouTube channel link or Any Link",
-      "value": "https://youtube.com/@NandEditz",
+      "value": "https://youtube.com/@akgamers2413",
       "required": false
     },
     "GITHUB": {
       "description": "Your GitHub profile link or Any Link",
-      "value": "https://github.com/NoxxOP",
+      "value": "https://github.com/newiseland",
       "required": false
     },
     "DONATE": {
       "description": "Link where people can support/donate or Any Link",
-      "value": "http://bit.ly/3NITa3G",
+      "value": "https://t.me/SIDHI_MUSIC/23",
       "required": false
     },
     "START_IMG_URL": {
       "description": "Image that appears with the /start command",
-      "value": "https://graph.org/file/e054e63251ef2dc5729dd-6f719a9ecc59862631.png",
+      "value": "https://graph.org/file/7ba395651519c19b159f9-ec82d50bbe112893b9.jpg",
       "required": false
     }
   },
