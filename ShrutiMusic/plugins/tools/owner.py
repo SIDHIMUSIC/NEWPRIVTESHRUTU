@@ -25,6 +25,16 @@ PE = {
     "heart": "6267140231632262769",
     "owner": "6147603715462271535",
     "support": "6145175650190759830",
+    "case":"6242199485393409396",
+    "human":"5408846628763217930",
+    "music":"5276352986535194063",
+    "ai":"6242225001794114994",
+    "light":"5895215494230709454",
+    "lock":"5278573677900752088",
+    "vision":"5422439311196834318",
+    "here":"6062367259089703519",
+    "brain":"6026243612012974483",
+    "expert":"6082420869416619509",
 }
 
 
@@ -70,13 +80,13 @@ def owner_welcome_text():
         f"<b>{crown} ᴏᴡɴᴇʀ ʜᴀs ᴀʀʀɪᴠᴇᴅ</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"{star} <b>ᴡᴇʟᴄᴏᴍᴇ</b>\n"
-        f"👤 <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
-        f"🔗 @{OWNER_USERNAME}\n\n"
-        f"<b>🛠️ ᴇxᴘᴇʀᴛɪsᴇ</b>\n"
-        f"🎵 ᴍᴜsɪᴄ ʙᴏᴛs\n"
-        f"🤖 ᴀɪ ʙᴏᴛs\n"
-        f"⚡ ᴜsᴇʀʙᴏᴛs & ᴛᴏᴏʟs\n\n"
-        f"{heart} <i>ɢʀᴏᴜᴘ ᴍᴇɪɴ ᴏᴡɴᴇʀ ᴘʀᴇsᴇɴᴛ ʜᴀɪ</i> ❤️"
+        f"{human} <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
+        f"{case} @{OWNER_USERNAME}\n\n"
+        f"<b>{expert} ᴇxᴘᴇʀᴛɪsᴇ</b>\n"
+        f"{music} ᴍᴜsɪᴄ ʙᴏᴛs\n"
+        f"{ai} ᴀɪ ʙᴏᴛs\n"
+        f"{light} ᴜsᴇʀʙᴏᴛs & ᴛᴏᴏʟs\n\n"
+        f"{heart} <i>ɢʀᴏᴜᴘ ᴍᴇɪɴ ᴏᴡɴᴇʀ ᴘʀᴇsᴇɴᴛ ʜᴀɪ</i> {heart} "
     )
 
 
@@ -86,7 +96,7 @@ def owner_welcome_buttons():
         [
             [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ ❍", url=config.SUPPORT_CHANNEL, pe_name="support")],
             [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍", url=config.SUPPORT_GROUP, pe_name="support")],
-            [make_btn("❍ ᴏᴡɴᴇʀ ❍", url=f"https://t.me/{OWNER_USERNAME}", pe_name="owner")],
+            [make_btn("❍ ᴏᴡɴᴇʀ ❍", url=f"https://t.me/{OWNER_USERNAME}", pe_name="case")],
         ]
     )
 
@@ -150,28 +160,28 @@ async def owner_cmd(_, message: Message):
         f"<b>{crown} ʙᴏᴛ ᴏᴡɴᴇʀ ᴘʀᴏғɪʟᴇ {star}</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"{star} ᴛʜɪs ʙᴏᴛ ɪs ᴘʀᴏᴜᴅʟʏ ᴄʀᴀғᴛᴇᴅ,\n"
-        f"ᴏᴡɴᴇᴅ ᴀɴᴅ ᴍᴀɴᴀɢᴇᴅ ʙʏ\n\n"
-        f"👤 <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
-        f"🔗 @{OWNER_USERNAME}\n\n"
+        ff\"{fire} ᴀ ᴘᴀssɪᴏɴᴀᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ & ᴛᴇᴄʜ ᴇɴᴛʜᴜsɪᴀsᴛ\\n\\n\""ᴏᴡɴᴇᴅ ᴀɴᴅ ᴍᴀɴᴀɢᴇᴅ ʙʏ\n\n"
+        f"{human} <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
+        f"{case} @{OWNER_USERNAME}\n\n"
         f"{fire} ᴀ ᴘᴀssɪᴏɴᴀᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ & ᴛᴇᴄʜ ᴇɴᴛʜᴜsɪᴀsᴛ\n\n"
-        f"<b>🛠️ ᴇxᴘᴇʀᴛɪsᴇ</b>\n"
-        f"• 🎵 ᴍᴜsɪᴄ ʙᴏᴛs\n"
-        f"• 🤖 ᴀɪ ʙᴏᴛs\n"
-        f"• ⚡ ᴜsᴇʀʙᴏᴛs & ᴛᴏᴏʟs\n"
-        f"• 🔐 sᴇᴄᴜʀᴇ sʏsᴛᴇᴍs\n"
+        f"<b>{expert} ᴇxᴘᴇʀᴛɪsᴇ</b>\n"
+        f"• {music} ᴍᴜsɪᴄ ʙᴏᴛs\n"
+        f"• {ai} ᴀɪ ʙᴏᴛs\n"
+        f"• {light} ᴜsᴇʀʙᴏᴛs & ᴛᴏᴏʟs\n"
+        f"• {lock} sᴇᴄᴜʀᴇ sʏsᴛᴇᴍs\n"
         f"• sᴍᴏᴏᴛʜ ᴜx {heart}\n\n"
-        f"<b>💡 ᴠɪsɪᴏɴ</b>\n"
+        f"<b>{bulb} ᴠɪsɪᴏɴ</b>\n"
         f"ᴄʀᴇᴀᴛɪɴɢ ᴘᴏᴡᴇʀғᴜʟ, ʀᴇʟɪᴀʙʟᴇ &\n"
         f"ᴜsᴇʀ-ғʀɪᴇɴᴅʟʏ ʙᴏᴛs\n"
-        f"ᴛʜᴀᴛ ᴍᴀᴋᴇ ᴛᴇʟᴇɢʀᴀᴍ sᴍᴀʀᴛᴇʀ ⚡\n\n"
-        f"👇 ᴄᴏɴɴᴇᴄᴛ & sᴛᴀʏ ᴜᴘᴅᴀᴛᴇᴅ"
+        f"ᴛʜᴀᴛ ᴍᴀᴋᴇ ᴛᴇʟᴇɢʀᴀᴍ sᴍᴀʀᴛᴇʀ {light} \n\n"
+        f"{here} ᴄᴏɴɴᴇᴄᴛ & sᴛᴀʏ ᴜᴘᴅᴀᴛᴇᴅ"
     )
 
     keyboard = InlineKeyboardMarkup(
         [
-            [make_btn("👑❍ ᴏᴡɴᴇʀ ❍", url=f"https://t.me/{OWNER_USERNAME}", pe_name="owner")],
-            [make_btn("💎❍ ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ ❍", url=config.SUPPORT_CHANNEL, pe_name="support")],
-            [make_btn("💎❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍", url=config.SUPPORT_GROUP, pe_name="support")],
+            [make_btn("❍ ᴏᴡɴᴇʀ ❍", url=f"https://t.me/{OWNER_USERNAME}", pe_name="owner")],
+            [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ ❍", url=config.SUPPORT_CHANNEL, pe_name="support")],
+            [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍", url=config.SUPPORT_GROUP, pe_name="case")],
         ]
     )
 
