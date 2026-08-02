@@ -59,7 +59,7 @@ def private_panel(_):
             btn(_["S_B_5"], user_id=config.OWNER_ID, pe_name="owner"),
         ],
         [
-            btn(_["S_B_4"], callback_data="help_page_1", pe_name="help"),
+            btn(_["S_B_4"], callback_data="help_page_1", pe_name="add"),
         ],
     ]
 
