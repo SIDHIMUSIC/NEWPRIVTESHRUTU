@@ -49,11 +49,13 @@ def help_pannel_page1(_, START: Union[bool, int] = None):
                 btn(_["H_B_10"], callback_data="help_callback hb10", pe_name="help"),
             ],
             [
-    btn("⏮", callback_data="help_page_4", pe_name="back"),
-    btn(
-        _["BACK_BUTTON"] if START else _["CLOSE_BUTTON"],
-        callback_data="settingsback_helper" if START else "close",
-        pe_name="back",
-    ),
-    btn("⏭", callback_data="help_page_2", pe_name="back"),
-],
+                btn("⏮", callback_data="help_page_4", pe_name="back"),
+                btn(
+                    _["BACK_BUTTON"] if START else _["CLOSE_BUTTON"],
+                    callback_data="settingsback_helper" if START else "close",
+                    pe_name="back",
+                ),
+                btn("⏭", callback_data="help_page_2", pe_name="back"),
+            ],
+        ]
+    )
