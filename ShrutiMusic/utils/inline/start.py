@@ -4,14 +4,19 @@ from ShrutiMusic import app
 
 # Premium emoji IDs
 PE = {
-    "owner": "6147603715462271535",
-    "support": "6145175650190759830",
+    "owner": "5323261373801571717",
+    "support": "5019759554234156094",
     "channel": "6145175650190759830",
     "add": "6026292029179301727",
-    "help": "5413702412983389863",
+    "comman": "6118209143972040877",
     "network": "6026162407066309019",
     "source": "5416081784641168838",
     "back": "5215260113291455937",
+    # Apne custom
+    "igram": "4990082283701535678",
+    "ghub": "5933540612694347912",
+    "ytune": "6325448939570989024",
+    "dont": "5462975985630600496",
 }
 
 
@@ -79,12 +84,12 @@ def about_panel(_):
 def owner_panel(_):
     return [
         [
-            InlineKeyboardButton(text=_["S_H_1"], url=config.INSTAGRAM),
-            InlineKeyboardButton(text=_["S_H_2"], url=config.YOUTUBE),
+            InlineKeyboardButton(text=_["S_H_1"], url=config.INSTAGRAM, pe_name="igram"),
+            InlineKeyboardButton(text=_["S_H_2"], url=config.YOUTUBE pe_name="ytune"),
         ],
         [
-            InlineKeyboardButton(text=_["S_H_3"], url=config.GITHUB),
-            InlineKeyboardButton(text=_["S_H_4"], url=config.DONATE),
+            InlineKeyboardButton(text=_["S_H_3"], url=config.GITHUB pe_name="ghub"),
+            InlineKeyboardButton(text=_["S_H_4"], url=config.DONATE pe_name="dont"),
         ],
         [
             btn(_["BACK_BUTTON"], callback_data="settingsback_helper", pe_name="back"),
