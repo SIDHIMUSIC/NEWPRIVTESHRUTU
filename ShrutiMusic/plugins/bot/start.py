@@ -24,7 +24,7 @@ from config import BANNED_USERS
 from strings import get_string
 
 
-@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
+@app.on_message(filters.command(["start"]) & filters.private & \~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
     await add_served_user(message.from_user.id)
@@ -32,21 +32,12 @@ async def start_pm(client, message: Message, _):
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
             keyboard = help_pannel_page1(_)
-            try:
-                return await message.reply_photo(
-                    photo=config.START_IMG_URL,
-                    caption=_["help_1"].format(config.SUPPORT_GROUP),
-                    reply_markup=keyboard,
-                    message_effect_id=5159385139981059251,
-                    parse_mode=ParseMode.HTML,
-                )
-            except:
-                return await message.reply_photo(
-                    photo=config.START_IMG_URL,
-                    caption=_["help_1"].format(config.SUPPORT_GROUP),
-                    reply_markup=keyboard,
-                    parse_mode=ParseMode.HTML,
-                )
+            return await message.reply_photo(
+                photo=config.START_IMG_URL,
+                caption=_["help_1"].format(config.SUPPORT_GROUP),
+                reply_markup=keyboard,
+                parse_mode=ParseMode.HTML,
+            )
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
             if await is_on_off(2):
@@ -82,23 +73,13 @@ async def start_pm(client, message: Message, _):
                 ]
             )
             await m.delete()
-            try:
-                await app.send_photo(
-                    chat_id=message.chat.id,
-                    photo=thumbnail,
-                    caption=searched_text,
-                    reply_markup=key,
-                    message_effect_id=5159385139981059251,
-                    parse_mode=ParseMode.HTML,
-                )
-            except:
-                await app.send_photo(
-                    chat_id=message.chat.id,
-                    photo=thumbnail,
-                    caption=searched_text,
-                    reply_markup=key,
-                    parse_mode=ParseMode.HTML,
-                )
+            await app.send_photo(
+                chat_id=message.chat.id,
+                photo=thumbnail,
+                caption=searched_text,
+                reply_markup=key,
+                parse_mode=ParseMode.HTML,
+            )
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOG_GROUP_ID,
@@ -108,21 +89,12 @@ async def start_pm(client, message: Message, _):
         if name == "start":
             out = private_panel(_)
             UP, CPU, RAM, DISK = await bot_sys_stats()
-            try:
-                await message.reply_photo(
-                    photo=config.START_IMG_URL,
-                    caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
-                    reply_markup=InlineKeyboardMarkup(out),
-                    message_effect_id=5159385139981059251,
-                    parse_mode=ParseMode.HTML,
-                )
-            except:
-                await message.reply_photo(
-                    photo=config.START_IMG_URL,
-                    caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
-                    reply_markup=InlineKeyboardMarkup(out),
-                    parse_mode=ParseMode.HTML,
-                )
+            await message.reply_photo(
+                photo=config.START_IMG_URL,
+                caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
+                reply_markup=InlineKeyboardMarkup(out),
+                parse_mode=ParseMode.HTML,
+            )
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOG_GROUP_ID,
@@ -132,21 +104,12 @@ async def start_pm(client, message: Message, _):
     else:
         out = private_panel(_)
         UP, CPU, RAM, DISK = await bot_sys_stats()
-        try:
-            await message.reply_photo(
-                photo=config.START_IMG_URL,
-                caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
-                reply_markup=InlineKeyboardMarkup(out),
-                message_effect_id=5159385139981059251,
-                parse_mode=ParseMode.HTML,
-            )
-        except:
-            await message.reply_photo(
-                photo=config.START_IMG_URL,
-                caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
-                reply_markup=InlineKeyboardMarkup(out),
-                parse_mode=ParseMode.HTML,
-            )
+        await message.reply_photo(
+            photo=config.START_IMG_URL,
+            caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
+            reply_markup=InlineKeyboardMarkup(out),
+            parse_mode=ParseMode.HTML,
+        )
         if await is_on_off(2):
             return await app.send_message(
                 chat_id=config.LOG_GROUP_ID,
@@ -155,26 +118,17 @@ async def start_pm(client, message: Message, _):
             )
 
 
-@app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
+@app.on_message(filters.command(["start"]) & filters.group & \~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
     uptime = int(time.time() - _boot_)
-    try:
-        await message.reply_photo(
-            photo=config.START_IMG_URL,
-            caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
-            reply_markup=InlineKeyboardMarkup(out),
-            message_effect_id=5159385139981059251,
-            parse_mode=ParseMode.HTML,
-        )
-    except:
-        await message.reply_photo(
-            photo=config.START_IMG_URL,
-            caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
-            reply_markup=InlineKeyboardMarkup(out),
-            parse_mode=ParseMode.HTML,
-        )
+    await message.reply_photo(
+        photo=config.START_IMG_URL,
+        caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
+        reply_markup=InlineKeyboardMarkup(out),
+        parse_mode=ParseMode.HTML,
+    )
     return await add_served_chat(message.chat.id)
 
 
@@ -206,31 +160,17 @@ async def welcome(client, message: Message):
                     return await app.leave_chat(message.chat.id)
 
                 out = start_panel(_)
-                try:
-                    await message.reply_photo(
-                        photo=config.START_IMG_URL,
-                        caption=_["start_3"].format(
-                            message.from_user.first_name,
-                            app.mention,
-                            message.chat.title,
-                            app.mention,
-                        ),
-                        reply_markup=InlineKeyboardMarkup(out),
-                        message_effect_id=5159385139981059251,
-                        parse_mode=ParseMode.HTML,
-                    )
-                except:
-                    await message.reply_photo(
-                        photo=config.START_IMG_URL,
-                        caption=_["start_3"].format(
-                            message.from_user.first_name,
-                            app.mention,
-                            message.chat.title,
-                            app.mention,
-                        ),
-                        reply_markup=InlineKeyboardMarkup(out),
-                        parse_mode=ParseMode.HTML,
-                    )
+                await message.reply_photo(
+                    photo=config.START_IMG_URL,
+                    caption=_["start_3"].format(
+                        message.from_user.first_name,
+                        app.mention,
+                        message.chat.title,
+                        app.mention,
+                    ),
+                    reply_markup=InlineKeyboardMarkup(out),
+                    parse_mode=ParseMode.HTML,
+                )
                 await add_served_chat(message.chat.id)
                 await message.stop_propagation()
         except Exception as ex:
