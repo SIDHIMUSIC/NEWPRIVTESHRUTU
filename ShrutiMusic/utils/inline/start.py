@@ -85,11 +85,11 @@ def owner_panel(_):
     return [
         [
             InlineKeyboardButton(text=_["S_H_1"], url=config.INSTAGRAM, pe_name="igram"),
-            InlineKeyboardButton(text=_["S_H_2"], url=config.YOUTUBE pe_name="ytune"),
+            InlineKeyboardButton(text=_["S_H_2"], url=config.YOUTUBE, pe_name="ytune"),
         ],
         [
-            InlineKeyboardButton(text=_["S_H_3"], url=config.GITHUB pe_name="ghub"),
-            InlineKeyboardButton(text=_["S_H_4"], url=config.DONATE pe_name="dont"),
+            InlineKeyboardButton(text=_["S_H_3"], url=config.GITHUB, pe_name="ghub"),
+            InlineKeyboardButton(text=_["S_H_4"], url=config.DONATE, pe_name="dont"),
         ],
         [
             btn(_["BACK_BUTTON"], callback_data="settingsback_helper", pe_name="back"),
