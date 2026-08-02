@@ -14,7 +14,6 @@ OWNER_ID = 8170572505
 OWNER_USERNAME = "SANATANI_BACCHA"
 OWNER_NAME = "𓆩◕🇭𝐀𝐑𝐑𝐘◕𓆪 =‌𐏓 ⤨⃝🇮🇳™"
 
-# Groups jahan owner ko already welcome mil chuka (bot restart tak)
 _welcomed_chats = set()
 
 # ================= PREMIUM EMOJI =================
@@ -25,20 +24,19 @@ PE = {
     "heart": "6267140231632262769",
     "owner": "6147603715462271535",
     "support": "6145175650190759830",
-    "case":"6242199485393409396",
-    "human":"5408846628763217930",
-    "music":"5276352986535194063",
-    "ai":"6242225001794114994",
-    "light":"5895215494230709454",
-    "lock":"5278573677900752088",
-    "vision":"5422439311196834318",
-    "here":"6062367259089703519",
-    "brain":"6026243612012974483",
-    "expert":"6082420869416619509",
+    "case": "6242199485393409396",
+    "human": "5408846628763217930",
+    "music": "5276352986535194063",
+    "ai": "6242225001794114994",
+    "light": "5895215494230709454",
+    "lock": "5278573677900752088",
+    "vision": "5422439311196834318",
+    "here": "6062367259089703519",
+    "brain": "6026243612012974483",
+    "expert": "6082420869416619509",
 }
 
 
-# Message text ke liye premium emoji (Pyrogram format)
 def pe(name: str, fallback: str = "✨") -> str:
     eid = (PE.get(name) or "").strip()
     if not eid or not eid.isdigit():
@@ -46,13 +44,11 @@ def pe(name: str, fallback: str = "✨") -> str:
     return f'<emoji id="{eid}">{fallback}</emoji>'
 
 
-# Check: emoji ID valid hai ya nahi
 def pe_works(name: str) -> bool:
     eid = (PE.get(name) or "").strip()
     return bool(eid and eid.isdigit())
 
 
-# Button banata hai — pe_name se icon_custom_emoji_id try karega
 def make_btn(text: str, url: str = None, callback_data: str = None, pe_name: str = None):
     kwargs = {"text": text}
     if url:
@@ -70,11 +66,16 @@ def make_btn(text: str, url: str = None, callback_data: str = None, pe_name: str
         return InlineKeyboardButton(**kwargs)
 
 
-# Owner welcome message ka text
 def owner_welcome_text():
     crown = pe("crown", "👑")
     star = pe("star", "✨")
     heart = pe("heart", "💎")
+    human = pe("human", "👤")
+    case = pe("case", "🔗")
+    expert = pe("expert", "🛠️")
+    music = pe("music", "🎵")
+    ai = pe("ai", "🤖")
+    light = pe("light", "⚡")
 
     return (
         f"<b>{crown} ᴏᴡɴᴇʀ ʜᴀs ᴀʀʀɪᴠᴇᴅ</b>\n"
@@ -86,22 +87,20 @@ def owner_welcome_text():
         f"{music} ᴍᴜsɪᴄ ʙᴏᴛs\n"
         f"{ai} ᴀɪ ʙᴏᴛs\n"
         f"{light} ᴜsᴇʀʙᴏᴛs & ᴛᴏᴏʟs\n\n"
-        f"{heart} <i>ɢʀᴏᴜᴘ ᴍᴇɪɴ ᴏᴡɴᴇʀ ᴘʀᴇsᴇɴᴛ ʜᴀɪ</i> {heart} "
+        f"{heart} <i>ɢʀᴏᴜᴘ ᴍᴇɪɴ ᴏᴡɴᴇʀ ᴘʀᴇsᴇɴᴛ ʜᴀɪ</i> {heart}"
     )
 
 
-# Welcome message ke neeche buttons (ek ke neeche ek)
 def owner_welcome_buttons():
     return InlineKeyboardMarkup(
         [
             [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ ❍", url=config.SUPPORT_CHANNEL, pe_name="support")],
             [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍", url=config.SUPPORT_GROUP, pe_name="support")],
-            [make_btn("❍ ᴏᴡɴᴇʀ ❍", url=f"https://t.me/{OWNER_USERNAME}", pe_name="case")],
+            [make_btn("❍ ᴏᴡɴᴇʀ ❍", url=f"https://t.me/{OWNER_USERNAME}", pe_name="owner")],
         ]
     )
 
 
-# Jab owner group mein naya join kare → welcome
 @app.on_chat_member_updated()
 async def owner_joined(_, update: ChatMemberUpdated):
     if not (update.new_chat_member and update.new_chat_member.user):
@@ -132,7 +131,6 @@ async def owner_joined(_, update: ChatMemberUpdated):
         )
 
 
-# Agar owner already group mein hai → pehle message pe welcome
 @app.on_message(filters.group & filters.user(OWNER_ID), group=8)
 async def owner_first_message(_, message: Message):
     chat_id = message.chat.id
@@ -148,19 +146,27 @@ async def owner_first_message(_, message: Message):
     )
 
 
-# /owner command → owner profile + buttons
 @app.on_message(filters.command("owner"))
 async def owner_cmd(_, message: Message):
     crown = pe("crown", "👑")
     star = pe("star", "✨")
     fire = pe("fire", "🚀")
     heart = pe("heart", "💎")
+    human = pe("human", "👤")
+    case = pe("case", "🔗")
+    expert = pe("expert", "🛠️")
+    music = pe("music", "🎵")
+    ai = pe("ai", "🤖")
+    light = pe("light", "⚡")
+    lock = pe("lock", "🔐")
+    vision = pe("vision", "💡")
+    here = pe("here", "👇")
 
     text = (
         f"<b>{crown} ʙᴏᴛ ᴏᴡɴᴇʀ ᴘʀᴏғɪʟᴇ {star}</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"{star} ᴛʜɪs ʙᴏᴛ ɪs ᴘʀᴏᴜᴅʟʏ ᴄʀᴀғᴛᴇᴅ,\n"
-        ff\"{fire} ᴀ ᴘᴀssɪᴏɴᴀᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ & ᴛᴇᴄʜ ᴇɴᴛʜᴜsɪᴀsᴛ\\n\\n\""ᴏᴡɴᴇᴅ ᴀɴᴅ ᴍᴀɴᴀɢᴇᴅ ʙʏ\n\n"
+        f"ᴏᴡɴᴇᴅ ᴀɴᴅ ᴍᴀɴᴀɢᴇᴅ ʙʏ\n\n"
         f"{human} <b><a href='https://t.me/{OWNER_USERNAME}'>{OWNER_NAME}</a></b>\n"
         f"{case} @{OWNER_USERNAME}\n\n"
         f"{fire} ᴀ ᴘᴀssɪᴏɴᴀᴛᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ & ᴛᴇᴄʜ ᴇɴᴛʜᴜsɪᴀsᴛ\n\n"
@@ -170,10 +176,10 @@ async def owner_cmd(_, message: Message):
         f"• {light} ᴜsᴇʀʙᴏᴛs & ᴛᴏᴏʟs\n"
         f"• {lock} sᴇᴄᴜʀᴇ sʏsᴛᴇᴍs\n"
         f"• sᴍᴏᴏᴛʜ ᴜx {heart}\n\n"
-        f"<b>{bulb} ᴠɪsɪᴏɴ</b>\n"
+        f"<b>{vision} ᴠɪsɪᴏɴ</b>\n"
         f"ᴄʀᴇᴀᴛɪɴɢ ᴘᴏᴡᴇʀғᴜʟ, ʀᴇʟɪᴀʙʟᴇ &\n"
         f"ᴜsᴇʀ-ғʀɪᴇɴᴅʟʏ ʙᴏᴛs\n"
-        f"ᴛʜᴀᴛ ᴍᴀᴋᴇ ᴛᴇʟᴇɢʀᴀᴍ sᴍᴀʀᴛᴇʀ {light} \n\n"
+        f"ᴛʜᴀᴛ ᴍᴀᴋᴇ ᴛᴇʟᴇɢʀᴀᴍ sᴍᴀʀᴛᴇʀ {light}\n\n"
         f"{here} ᴄᴏɴɴᴇᴄᴛ & sᴛᴀʏ ᴜᴘᴅᴀᴛᴇᴅ"
     )
 
@@ -181,7 +187,7 @@ async def owner_cmd(_, message: Message):
         [
             [make_btn("❍ ᴏᴡɴᴇʀ ❍", url=f"https://t.me/{OWNER_USERNAME}", pe_name="owner")],
             [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ ❍", url=config.SUPPORT_CHANNEL, pe_name="support")],
-            [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍", url=config.SUPPORT_GROUP, pe_name="case")],
+            [make_btn("❍ ꜱᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ ❍", url=config.SUPPORT_GROUP, pe_name="support")],
         ]
     )
 
@@ -193,7 +199,6 @@ async def owner_cmd(_, message: Message):
     )
 
 
-# Group mein hi/hello/gm etc. pe chat ko database mein save karna
 @app.on_message(
     filters.command(
         ["hi", "hii", "hello", "hui", "good", "gm", "ok", "bye", "welcome", "thanks"],
