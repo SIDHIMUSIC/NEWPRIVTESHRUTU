@@ -19,7 +19,7 @@
 # Contact for permissions:
 # Email: badboy809075@gmail.com
 
-
+from pyrogram.enums import ParseMode
 from typing import Union
 
 from pyrogram import filters, types
@@ -57,7 +57,9 @@ async def helper_private(
         from ShrutiMusic.utils.inline.help import help_pannel_page1
         keyboard = help_pannel_page1(_, True)
         await update.edit_message_text(
-            _["help_1"].format(SUPPORT_GROUP), reply_markup=keyboard
+            _["help_1"].format(SUPPORT_GROUP),
+            reply_markup=keyboard,
+            parse_mode=ParseMode.HTML,
         )
     else:
         try:
@@ -68,10 +70,11 @@ async def helper_private(
         _ = get_string(language)
         from ShrutiMusic.utils.inline.help import help_pannel_page1
         keyboard = help_pannel_page1(_)
-        await update.reply_photo(
-            photo=START_IMG_URL,
-            caption=_["help_1"].format(SUPPORT_GROUP),
+        await update.reply_photo(photo=START_IMG_URL)
+        await update.reply_text(
+            _["help_1"].format(SUPPORT_GROUP),
             reply_markup=keyboard,
+            parse_mode=ParseMode.HTML,
         )
 
 
