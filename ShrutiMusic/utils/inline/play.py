@@ -77,11 +77,11 @@ def stream_markup_timer(_, chat_id, played, dur):
             )
         ],
         [
-            btn("▷", callback_data=f"ADMIN Resume|{chat_id}", pe_name="play"),
-            btn("II", callback_data=f"ADMIN Pause|{chat_id}", pe_name="pause"),
-            btn("↻", callback_data=f"ADMIN Replay|{chat_id}", pe_name="replay"),
-            btn("‣‣I", callback_data=f"ADMIN Skip|{chat_id}", pe_name="skip"),
-            btn("▢", callback_data=f"ADMIN Stop|{chat_id}", pe_name="stop"),
+            btn("", callback_data=f"ADMIN Resume|{chat_id}", pe_name="play"),
+            btn("", callback_data=f"ADMIN Pause|{chat_id}", pe_name="pause"),
+            btn("", callback_data=f"ADMIN Replay|{chat_id}", pe_name="replay"),
+            btn("", callback_data=f"ADMIN Skip|{chat_id}", pe_name="skip"),
+            btn("", callback_data=f"ADMIN Stop|{chat_id}", pe_name="stop"),
         ],
         [
             btn("sᴜᴘᴘᴏʀᴛ", url=SUPPORT_GROUP, pe_name="support"),
