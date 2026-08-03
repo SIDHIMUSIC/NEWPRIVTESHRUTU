@@ -60,6 +60,7 @@ async def helper_private(
             _["help_1"].format(SUPPORT_GROUP),
             reply_markup=keyboard,
             parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
         )
     else:
         try:
@@ -75,6 +76,7 @@ async def helper_private(
             _["help_1"].format(SUPPORT_GROUP),
             reply_markup=keyboard,
             parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
         )
 
 
