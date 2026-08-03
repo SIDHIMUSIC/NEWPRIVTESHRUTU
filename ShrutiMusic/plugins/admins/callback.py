@@ -76,26 +76,42 @@ async def show_help_page1(client, callback_query: CallbackQuery):
     )
 
 @app.on_callback_query(filters.regex("fork_repo"))
+@app.on_callback_query(filters.regex("fork_repo"))
 async def fork_repo_callback(client, query):
     await query.message.edit_text(
         text=(
-            "✨ <b>ʙᴜɪʟᴅ Yᴏᴜʀ Oᴡɴ ᴍᴜsɪᴄ ʙᴏᴛ 🎧</b>\n\n"
-            "🚀 ʀᴇᴀᴅʏ ᴛᴏ ʟᴀᴜɴᴄʜ ʏᴏᴜʀ ᴏᴡɴ ʙᴏᴛ?\n"
-            "ғᴏʀᴋ ᴛʜᴇ ʀᴇᴘᴏ ᴀɴᴅ ᴅᴇᴘʟᴏʏ ɪɴ sᴇᴄᴏɴᴅs.\n\n"
-            "🔧 <b>Cᴜsᴛᴏᴍɪᴢᴇ ɪᴛ. Dᴇᴘʟᴏʏ ɪᴛ. Vɪʙᴇ ᴡɪᴛʜ ɪᴛ 🔥</b>"
+            '<emoji id="5253742260054409879">✨</emoji> <b>ʙᴜɪʟᴅ ʏᴏᴜʀ ᴏᴡɴ ᴍᴜꜱɪᴄ ʙᴏᴛ</b> '
+            '<emoji id="6246810588052199536">🎧</emoji>\n\n'
+            '<emoji id="6147654280112248427">🚀</emoji> ʀᴇᴀᴅʏ ᴛᴏ ʟᴀᴜɴᴄʜ ʏᴏᴜʀ ᴏᴡɴ ʙᴏᴛ?\n'
+            'ꜰᴏʀᴋ ᴛʜᴇ ʀᴇᴘᴏ ᴀɴᴅ ᴅᴇᴘʟᴏʏ ɪɴ ꜱᴇᴄᴏɴᴅꜱ.\n\n'
+            '<emoji id="5408940598352687316">🔧</emoji> <b>ᴄᴜꜱᴛᴏᴍɪᴢᴇ ɪᴛ. ᴅᴇᴘʟᴏʏ ɪᴛ. ᴠɪʙᴇ ᴡɪᴛʜ ɪᴛ</b> '
+            '<emoji id="6217316588069067806">🔥</emoji>'
         ),
+        parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🚀 ʏᴀʜᴀ ᴛᴏᴜᴄʜ ᴋʀᴏ", url="https://t.me/ITZ_ASHUI"),
-                    InlineKeyboardButton("⚡ ᴅᴇᴘʟᴏʏ ᴋᴇ ʟɪʏᴇ ʏᴀʜᴀ ᴋʀᴏ", url="https://t.me/SANATANI_BACCHA")
+                    InlineKeyboardButton(
+                        "ʏᴀʜᴀ ᴛᴏᴜᴄʜ ᴋʀᴏ",
+                        url="https://t.me/ITZ_ASHUI",
+                        icon_custom_emoji_id="6129584162992034014",
+                    ),
+                    InlineKeyboardButton(
+                        "ᴅᴇᴘʟᴏʏ ᴋᴇ ʟɪʏᴇ ʏᴀʜᴀ ᴋʀᴏ",
+                        url="https://t.me/SANATANI_BACCHA",
+                        icon_custom_emoji_id="5416081784641168838",
+                    ),
                 ],
                 [
-                    InlineKeyboardButton("🔙 Bᴀᴄᴋ", callback_data="settingsback_helper")
-                ]
+                    InlineKeyboardButton(
+                        "Bᴀᴄᴋ",
+                        callback_data="settingsback_helper",
+                        icon_custom_emoji_id="5454086193601863728",
+                    )
+                ],
             ]
-        )
+        ),
     )
 
 
