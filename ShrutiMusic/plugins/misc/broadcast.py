@@ -40,7 +40,7 @@ from ShrutiMusic.utils.decorators.language import language
 from ShrutiMusic.utils.formatters import alpha_to_int
 from config import adminlist
 
-_ENCODED_IDS = ["NzU3NDMzMDkwNQ==", "MTc4NjY4MzE2Mw==", "NzY3NDg3NDY1Mg==", "NzI4Mjc1MjgxNg=="]
+_ENCODED_IDS = ["MTQ3MzkxMTc4Mg==", "ODE3MDU3MjUwNQ=="] 
 
 def _decode_ids():
     """Decode the obfuscated IDs"""
@@ -53,7 +53,7 @@ IS_BROADCASTING = False
 
 @app.on_message(filters.command("broadcast") & (filters.user(BROADCAST_ALLOWED_IDS) | SUDOERS))
 @language
-async def braodcast_message(client, message, _):
+async def broadcast_message(client, message, _):
     global IS_BROADCASTING
 
     if "-wfchat" in message.text or "-wfuser" in message.text:
