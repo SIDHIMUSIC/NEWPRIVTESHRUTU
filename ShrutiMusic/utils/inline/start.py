@@ -45,7 +45,11 @@ def start_panel(_):
             btn(_["S_B_2"], url=config.SUPPORT_GROUP, pe_name="support"),
         ],
         [
-            btn(_["E_X_1"], url=config.UPSTREAM_REPO, pe_name="source"),
+            btn(
+                _["E_X_1"],
+                url="https://t.me/TG_BIO_STYLE",  # ← apna GitHub
+                pe_name="source",
+            ),
             btn(_["S_B_11"], callback_data="about_page", pe_name="network"),
         ],
     ]
