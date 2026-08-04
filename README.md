@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="ShrutiMusic/assets/equalizer.svg" width="100%" height="500">
+  <img src="ShrutiMusic/assets/ShrutiBots.jpg" width="100%" height="500">
 </p>
 
 <div align="center">
@@ -24,13 +24,17 @@
 
 ## 🚀 Quick Deploy
 
-| Platform | Deploy | Info |
-|:---:|:---:|:---:|
-| **Heroku** | Deploy from your fork | One-Click |
-| **VPS** | See guide below | Full control |
-| **Render** | Deploy from your fork | Free tier |
-
----
+<p align="center">
+  <a href="https://dashboard.heroku.com/new?template=https://github.com/SIDHIMUSIC/NEWPRIVTESHRUTU">
+    <img src="https://img.shields.io/badge/⚡_Heroku_Deploy-430098?style=for-the-badge&logo=heroku&logoColor=white" alt="Heroku">
+  </a>
+  <a href="https://render.com/deploy?repo=https://github.com/SIDHIMUSIC/NEWPRIVTESHRUTU">
+    <img src="https://img.shields.io/badge/🚀_Render_Deploy-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render">
+  </a>
+  <a href="https://github.com/SIDHIMUSIC/NEWPRIVTESHRUTU#-vps-deployment">
+    <img src="https://img.shields.io/badge/💻_VPS_Guide-111111?style=for-the-badge&logo=ubuntu&logoColor=white" alt="VPS">
+  </a>
+</p>
 
 ## ✨ Features
 
