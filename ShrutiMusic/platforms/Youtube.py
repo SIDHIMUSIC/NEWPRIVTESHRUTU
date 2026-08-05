@@ -32,9 +32,8 @@ def _extract_id(link: str) -> str:
     return link.strip()
 
 
-def _base_ydl_opts(outtmpl: str) -> dict:
+def _base_ydl_opts(outtmpl: str = None) -> dict:
     opts = {
-        "outtmpl": outtmpl,
         "quiet": True,
         "no_warnings": True,
         "noprogress": True,
@@ -43,9 +42,15 @@ def _base_ydl_opts(outtmpl: str) -> dict:
         "retries": 5,
         "fragment_retries": 5,
         "ignoreerrors": False,
+        "noplaylist": True,
     }
+    if outtmpl:
+        opts["outtmpl"] = outtmpl
     if os.path.exists(COOKIES_FILE):
         opts["cookiefile"] = COOKIES_FILE
+        print(f"[yt-dlp] using cookies: {COOKIES_FILE}")
+    else:
+        print("[yt-dlp] cookies.txt NOT FOUND")
     return opts
 
 
@@ -60,65 +65,85 @@ def _find_downloaded(video_id: str) -> str:
     return None
 
 
+def _pick_format_id(info: dict, audio_only: bool = True) -> str:
+    formats = info.get("formats") or []
+    if not formats:
+        return "best"
+
+    if audio_only:
+        candidates = [
+            f for f in formats
+            if f.get("acodec") not in (None, "none")
+            and f.get("vcodec") in (None, "none")
+            and f.get("format_id")
+        ]
+        if not candidates:
+            candidates = [
+                f for f in formats
+                if f.get("acodec") not in (None, "none") and f.get("format_id")
+            ]
+    else:
+        candidates = [f for f in formats if f.get("format_id")]
+
+    if not candidates:
+        return "best"
+
+    candidates = sorted(
+        candidates,
+        key=lambda x: (x.get("abr") or x.get("tbr") or x.get("height") or 0),
+        reverse=True,
+    )
+    return candidates[0]["format_id"]
+
+
 async def _yt_dlp_audio(video_id: str, file_path: str) -> str:
     url = f"https://www.youtube.com/watch?v={video_id}"
     outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
 
-    # Try 1: bestaudio → mp3
-    try:
-        ydl_opts = _base_ydl_opts(outtmpl)
-        ydl_opts["format"] = "bestaudio/best"
-        ydl_opts["postprocessors"] = [
+    def _download():
+        # extract info → pick real format_id
+        info_opts = _base_ydl_opts()
+        with yt_dlp.YoutubeDL(info_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+
+        fmt_id = _pick_format_id(info, audio_only=True)
+        print(f"[yt-dlp audio] format_id={fmt_id}")
+
+        dl_opts = _base_ydl_opts(outtmpl)
+        dl_opts["format"] = fmt_id
+        dl_opts["postprocessors"] = [
             {
                 "key": "FFmpegExtractAudio",
                 "preferredcodec": "mp3",
                 "preferredquality": "192",
             }
         ]
-
-        def _dl():
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        try:
+            with yt_dlp.YoutubeDL(dl_opts) as ydl:
+                ydl.download([url])
+        except Exception as e:
+            print(f"[yt-dlp audio postprocess fail] {e}")
+            dl_opts.pop("postprocessors", None)
+            with yt_dlp.YoutubeDL(dl_opts) as ydl:
                 ydl.download([url])
 
-        await asyncio.get_event_loop().run_in_executor(None, _dl)
-        found = _find_downloaded(video_id)
-        if found:
-            return found
-    except Exception as e:
-        print(f"[yt-dlp audio try1] {e}")
-
-    # Try 2: m4a / any audio, no postprocess
     try:
-        ydl_opts = _base_ydl_opts(outtmpl)
-        ydl_opts["format"] = "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best"
-
-        def _dl2():
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([url])
-
-        await asyncio.get_event_loop().run_in_executor(None, _dl2)
-        found = _find_downloaded(video_id)
-        if found:
-            return found
+        await asyncio.get_event_loop().run_in_executor(None, _download)
+        return _find_downloaded(video_id)
     except Exception as e:
-        print(f"[yt-dlp audio try2] {e}")
+        print(f"[yt-dlp audio] {e}")
+        # last resort: plain best
+        try:
+            def _dl_best():
+                opts = _base_ydl_opts(outtmpl)
+                opts["format"] = "best"
+                with yt_dlp.YoutubeDL(opts) as ydl:
+                    ydl.download([url])
 
-    # Try 3: any format
-    try:
-        ydl_opts = _base_ydl_opts(outtmpl)
-        ydl_opts["format"] = "best"
-
-        def _dl3():
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([url])
-
-        await asyncio.get_event_loop().run_in_executor(None, _dl3)
-        found = _find_downloaded(video_id)
-        if found:
-            return found
-    except Exception as e:
-        print(f"[yt-dlp audio try3] {e}")
-
+            await asyncio.get_event_loop().run_in_executor(None, _dl_best)
+            return _find_downloaded(video_id)
+        except Exception as e2:
+            print(f"[yt-dlp audio last] {e2}")
     return None
 
 
@@ -126,28 +151,36 @@ async def _yt_dlp_video(video_id: str, file_path: str) -> str:
     url = f"https://www.youtube.com/watch?v={video_id}"
     outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
 
-    formats = [
-        "best[height<=720]/best[height<=480]/best",
-        "bestvideo[height<=720]+bestaudio/best",
-        "best",
-    ]
-    for fmt in formats:
-        try:
-            ydl_opts = _base_ydl_opts(outtmpl)
-            ydl_opts["format"] = fmt
-            ydl_opts["merge_output_format"] = "mp4"
+    def _download():
+        info_opts = _base_ydl_opts()
+        with yt_dlp.YoutubeDL(info_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
 
-            def _dl():
-                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        fmt_id = _pick_format_id(info, audio_only=False)
+        print(f"[yt-dlp video] format_id={fmt_id}")
+
+        dl_opts = _base_ydl_opts(outtmpl)
+        dl_opts["format"] = fmt_id
+        dl_opts["merge_output_format"] = "mp4"
+        with yt_dlp.YoutubeDL(dl_opts) as ydl:
+            ydl.download([url])
+
+    try:
+        await asyncio.get_event_loop().run_in_executor(None, _download)
+        return _find_downloaded(video_id)
+    except Exception as e:
+        print(f"[yt-dlp video] {e}")
+        try:
+            def _dl_best():
+                opts = _base_ydl_opts(outtmpl)
+                opts["format"] = "best"
+                with yt_dlp.YoutubeDL(opts) as ydl:
                     ydl.download([url])
 
-            await asyncio.get_event_loop().run_in_executor(None, _dl)
-            found = _find_downloaded(video_id)
-            if found:
-                return found
-        except Exception as e:
-            print(f"[yt-dlp video {fmt}] {e}")
-            continue
+            await asyncio.get_event_loop().run_in_executor(None, _dl_best)
+            return _find_downloaded(video_id)
+        except Exception as e2:
+            print(f"[yt-dlp video last] {e2}")
     return None
 
 
@@ -185,7 +218,7 @@ async def download_song(link: str) -> str:
             except Exception:
                 pass
 
-    # 2) yt-dlp
+    # 2) yt-dlp dynamic format
     return await _yt_dlp_audio(video_id, file_path)
 
 
@@ -356,9 +389,7 @@ class YouTubeAPI:
             link = self.base + link
         if "&" in link:
             link = link.split("&")[0]
-        ytdl_opts = {"quiet": True}
-        if os.path.exists(COOKIES_FILE):
-            ytdl_opts["cookiefile"] = COOKIES_FILE
+        ytdl_opts = _base_ydl_opts()
         ydl = yt_dlp.YoutubeDL(ytdl_opts)
         with ydl:
             formats_available = []
