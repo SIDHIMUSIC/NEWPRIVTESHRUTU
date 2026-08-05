@@ -12,6 +12,7 @@ API_URL = os.environ.get("SHRUTI_API_URL", "https://api01.shrutibots.site")
 API_KEY = os.environ.get("SHRUTI_API_KEY", "YOUR_API_KEY")
 
 DOWNLOAD_DIR = "downloads"
+COOKIES_FILE = os.environ.get("YT_COOKIES", "cookies.txt")
 
 
 def time_to_seconds(time):
@@ -20,32 +21,46 @@ def time_to_seconds(time):
 
 
 def _extract_id(link: str) -> str:
+    if not link:
+        return ""
     if "v=" in link:
-        return link.split("v=")[-1].split("&")[0]
+        return link.split("v=")[-1].split("&")[0].split("#")[0]
     if "youtu.be/" in link:
-        return link.split("youtu.be/")[-1].split("?")[0]
-    return link
+        return link.split("youtu.be/")[-1].split("?")[0].split("#")[0]
+    if "youtube.com/shorts/" in link:
+        return link.split("shorts/")[-1].split("?")[0].split("#")[0]
+    return link.strip()
+
+
+def _base_ydl_opts(outtmpl: str) -> dict:
+    opts = {
+        "format": "bestaudio/best",
+        "outtmpl": outtmpl,
+        "quiet": True,
+        "no_warnings": True,
+        "noprogress": True,
+        "geo_bypass": True,
+        "nocheckcertificate": True,
+        "retries": 3,
+        "fragment_retries": 3,
+    }
+    if os.path.exists(COOKIES_FILE):
+        opts["cookiefile"] = COOKIES_FILE
+    return opts
 
 
 async def _yt_dlp_audio(video_id: str, file_path: str) -> str:
     try:
         outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "outtmpl": outtmpl,
-            "quiet": True,
-            "no_warnings": True,
-            "noprogress": True,
-            "geo_bypass": True,
-            "nocheckcertificate": True,
-            "postprocessors": [
-                {
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "192",
-                }
-            ],
-        }
+        ydl_opts = _base_ydl_opts(outtmpl)
+        ydl_opts["format"] = "bestaudio/best"
+        ydl_opts["postprocessors"] = [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "192",
+            }
+        ]
         url = f"https://www.youtube.com/watch?v={video_id}"
 
         def _dl():
@@ -59,7 +74,7 @@ async def _yt_dlp_audio(video_id: str, file_path: str) -> str:
         for name in os.listdir(DOWNLOAD_DIR):
             if name.startswith(video_id):
                 path = os.path.join(DOWNLOAD_DIR, name)
-                if os.path.getsize(path) > 0:
+                if os.path.isfile(path) and os.path.getsize(path) > 0:
                     return path
     except Exception as e:
         print(f"[yt-dlp audio] {e}")
@@ -69,15 +84,8 @@ async def _yt_dlp_audio(video_id: str, file_path: str) -> str:
 async def _yt_dlp_video(video_id: str, file_path: str) -> str:
     try:
         outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
-        ydl_opts = {
-            "format": "best[height<=720]/best",
-            "outtmpl": outtmpl,
-            "quiet": True,
-            "no_warnings": True,
-            "noprogress": True,
-            "geo_bypass": True,
-            "nocheckcertificate": True,
-        }
+        ydl_opts = _base_ydl_opts(outtmpl)
+        ydl_opts["format"] = "best[height<=720]/best"
         url = f"https://www.youtube.com/watch?v={video_id}"
 
         def _dl():
@@ -91,7 +99,7 @@ async def _yt_dlp_video(video_id: str, file_path: str) -> str:
         for name in os.listdir(DOWNLOAD_DIR):
             if name.startswith(video_id):
                 path = os.path.join(DOWNLOAD_DIR, name)
-                if os.path.getsize(path) > 0:
+                if os.path.isfile(path) and os.path.getsize(path) > 0:
                     return path
     except Exception as e:
         print(f"[yt-dlp video] {e}")
@@ -122,6 +130,8 @@ async def download_song(link: str) -> str:
                             f.write(chunk)
                     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
                         return file_path
+                else:
+                    print(f"[API audio] status={resp.status}")
     except Exception as e:
         print(f"[API audio] {e}")
         if os.path.exists(file_path):
@@ -130,7 +140,7 @@ async def download_song(link: str) -> str:
             except Exception:
                 pass
 
-    # 2) yt-dlp fallback
+    # 2) yt-dlp (+ cookies if present)
     return await _yt_dlp_audio(video_id, file_path)
 
 
@@ -158,6 +168,8 @@ async def download_video(link: str) -> str:
                             f.write(chunk)
                     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
                         return file_path
+                else:
+                    print(f"[API video] status={resp.status}")
     except Exception as e:
         print(f"[API video] {e}")
         if os.path.exists(file_path):
@@ -166,7 +178,7 @@ async def download_video(link: str) -> str:
             except Exception:
                 pass
 
-    # 2) yt-dlp fallback
+    # 2) yt-dlp (+ cookies if present)
     return await _yt_dlp_video(video_id, file_path)
 
 
@@ -300,6 +312,8 @@ class YouTubeAPI:
         if "&" in link:
             link = link.split("&")[0]
         ytdl_opts = {"quiet": True}
+        if os.path.exists(COOKIES_FILE):
+            ytdl_opts["cookiefile"] = COOKIES_FILE
         ydl = yt_dlp.YoutubeDL(ytdl_opts)
         with ydl:
             formats_available = []
