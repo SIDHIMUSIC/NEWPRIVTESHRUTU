@@ -1,3 +1,4 @@
+import random
 import pyrogram
 from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus, ParseMode
@@ -5,6 +6,16 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 import config
 from ..logging import LOGGER
+
+
+BOOT_MEDIA = [
+    "https://graph.org/file/8177ce4e792492d6a42b6-b0666d400e69ffa81b.mp4",
+    "https://graph.org/file/3d8d031febeba8b435af3-43c26bbac2b8a6e143.mp4",
+    "https://graph.org/file/881dae734ccdfb9c0eb02-f08c986bf85299fafd.mp4",
+    "https://graph.org/file/8946cb933256633309d39-ba922ab92fa6e204fc.mp4",
+    "https://graph.org/file/f85ba6c9b8841d847649d-06ed9f876d677105c4.mp4",
+    "https://graph.org/file/0b6c160a27eeb4a8c0097-4f36363c14cac9f01b.mp4",
+]
 
 
 class Nand(Client):
@@ -32,41 +43,55 @@ class Nand(Client):
             [
                 [
                     InlineKeyboardButton(
-                        text="Add Me To Your Group",
+                        text="⦿ ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ ⦿",
                         url=f"https://t.me/{self.username}?startgroup=true",
                     )
-                ]
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="📢 ꜱᴜᴘᴘᴏʀᴛ",
+                        url=config.SUPPORT_CHANNEL,
+                    ),
+                    InlineKeyboardButton(
+                        text="💬 ɢʀᴏᴜᴘ",
+                        url=config.SUPPORT_GROUP,
+                    ),
+                ],
             ]
+        )
+
+        caption = (
+            f"<b>✦ ᴘʀᴀɢʏᴀ ᴍᴜꜱɪᴄ ᴏɴʟɪɴᴇ</b>\n"
+            f"━━━━━━━━━━━━━━━━━━\n\n"
+            f"<b>🎵 ɴᴀᴍᴇ :</b> {self.name}\n"
+            f"<b>🔗 ᴜꜱᴇʀɴᴀᴍᴇ :</b> @{self.username}\n"
+            f"<b>🆔 ɪᴅ :</b> <code>{self.id}</code>\n\n"
+            f"<b>⚡ ꜱᴛᴀᴛᴜꜱ :</b> <code>ʀᴜɴɴɪɴɢ</code>\n"
+            f"<b>💎 ᴍᴏᴅᴇ :</b> <code>ᴘʀᴇᴍɪᴜᴍ</code>\n\n"
+            f"━━━━━━━━━━━━━━━━━━\n"
+            f"<i>✦ ʙᴏᴛ ɪꜱ ʀᴇᴀᴅʏ ᴛᴏ ꜱᴇʀᴠᴇ ✨</i>"
         )
 
         if config.LOG_GROUP_ID:
             try:
-                await self.send_photo(
+                await self.send_video(
                     config.LOG_GROUP_ID,
-                    photo=config.START_IMG_URL,
-                    caption=f"<b>🎵 Bot Started Successfully</b>\n\n"
-                            f"<b>Name:</b> {self.name}\n"
-                            f"<b>Username:</b> @{self.username}\n"
-                            f"<b>ID:</b> <code>{self.id}</code>\n\n"
-                            f"<i>Bot is now online and ready to serve!</i>",
+                    video=random.choice(BOOT_MEDIA),
+                    caption=caption,
                     reply_markup=button,
                 )
-            except pyrogram.errors.ChatWriteForbidden:
-                LOGGER(__name__).error("Bot cannot write to the log group")
+            except Exception:
                 try:
-                    await self.send_message(
+                    await self.send_photo(
                         config.LOG_GROUP_ID,
-                        f"<b>🎵 Bot Started Successfully</b>\n\n"
-                        f"<b>Name:</b> {self.name}\n"
-                        f"<b>Username:</b> @{self.username}\n"
-                        f"<b>ID:</b> <code>{self.id}</code>\n\n"
-                        f"<i>Bot is now online and ready to serve!</i>",
+                        photo=config.START_IMG_URL,
+                        caption=caption,
                         reply_markup=button,
                     )
+                except pyrogram.errors.ChatWriteForbidden:
+                    LOGGER(__name__).error("Bot cannot write to the log group")
                 except Exception as e:
-                    LOGGER(__name__).error(f"Failed to send message in log group: {e}")
-            except Exception as e:
-                LOGGER(__name__).error(f"Error while sending to log group: {e}")
+                    LOGGER(__name__).error(f"Error while sending to log group: {e}")
         else:
             LOGGER(__name__).warning("LOG_GROUP_ID is not set")
 
