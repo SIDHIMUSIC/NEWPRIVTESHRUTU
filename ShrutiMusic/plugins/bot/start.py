@@ -26,33 +26,39 @@ from strings import get_string
 
 
 async def start_animation(message: Message):
-    vip = await message.reply_text(
-        f"**✦ ᴡᴇʟᴄᴏᴍᴇ {message.from_user.mention}**"
-    )
-    await asyncio.sleep(0.3)
-    await vip.edit_text(f"**✦ ᴡᴇʟᴄᴏᴍᴇ {message.from_user.mention} ✨**")
-    await asyncio.sleep(0.3)
-    await vip.edit_text("**✦ ʙᴏᴛ ꜱᴛᴀʀᴛɪɴɢ**")
-    await asyncio.sleep(0.25)
-    await vip.edit_text("**✦ ʙᴏᴛ ꜱᴛᴀʀᴛɪɴɢ .**")
-    await asyncio.sleep(0.25)
-    await vip.edit_text("**✦ ʙᴏᴛ ꜱᴛᴀʀᴛɪɴɢ ..**")
-    await asyncio.sleep(0.25)
-    await vip.edit_text("**✦ ʙᴏᴛ ꜱᴛᴀʀᴛɪɴɢ ...**")
-    await asyncio.sleep(0.3)
-    await vip.edit_text("**✦ ᴘʀᴀɢʏᴀ ᴍᴜꜱɪᴄ ʀᴇᴀᴅʏ 🎵**")
-    await asyncio.sleep(0.4)
-    await vip.delete()
+    try:
+        vip = await message.reply_text(
+            f"**✦ ᴡᴇʟᴄᴏᴍᴇ {message.from_user.mention}**"
+        )
+        await asyncio.sleep(0.3)
+        await vip.edit_text(f"**✦ ᴡᴇʟᴄᴏᴍᴇ {message.from_user.mention} ✨**")
+        await asyncio.sleep(0.3)
+        await vip.edit_text("**✦ ʟᴏᴀᴅɪɴɢ ᴘʀᴇᴍɪᴜᴍ ᴜɪ ...**")
+        await asyncio.sleep(0.3)
+        await vip.edit_text("**✦ ᴄᴏɴɴᴇᴄᴛɪɴɢ ᴛᴏ ꜱᴇʀᴠᴇʀ ...**")
+        await asyncio.sleep(0.3)
+        await vip.edit_text("**✦ ꜱʏꜱᴛᴇᴍ ʀᴇᴀᴅʏ**")
+        await asyncio.sleep(0.3)
+        await vip.edit_text("**✦ ᴘʀᴀɢʏᴀ ᴍᴜꜱɪᴄ ɪꜱ ʀᴇᴀᴅʏ 🎵**")
+        await asyncio.sleep(0.4)
+        await vip.delete()
 
-    done = await message.reply_text("❤️‍🔥")
-    await asyncio.sleep(0.4)
-    await done.delete()
+        done = await message.reply_text("❤️‍🔥")
+        await asyncio.sleep(0.4)
+        await done.delete()
+    except Exception:
+        pass
 
 
-@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
+@app.on_message(filters.command(["start"]) & filters.private & \~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
     await add_served_user(message.from_user.id)
+    try:
+        await message.react("❤️‍🔥")
+    except Exception:
+        pass
+
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
@@ -159,7 +165,7 @@ async def start_pm(client, message: Message, _):
             )
 
 
-@app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
+@app.on_message(filters.command(["start"]) & filters.group & \~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
