@@ -9,8 +9,7 @@ from py_yt import VideosSearch, Playlist
 import aiohttp
 
 API_URL = os.environ.get("SHRUTI_API_URL", "https://api01.shrutibots.site")
-
-API_KEY = os.environ.get("SHRUTI_API_KEY", "YOUR_API_KEY") ## Get This API KEY FROM TELEGRAM BOT USERNAME: @SHRUTIAPIBOT 
+API_KEY = os.environ.get("SHRUTI_API_KEY", "YOUR_API_KEY")
 
 DOWNLOAD_DIR = "downloads"
 
@@ -20,8 +19,87 @@ def time_to_seconds(time):
     return sum(int(x) * 60 ** i for i, x in enumerate(reversed(stringt.split(":"))))
 
 
+def _extract_id(link: str) -> str:
+    if "v=" in link:
+        return link.split("v=")[-1].split("&")[0]
+    if "youtu.be/" in link:
+        return link.split("youtu.be/")[-1].split("?")[0]
+    return link
+
+
+async def _yt_dlp_audio(video_id: str, file_path: str) -> str:
+    try:
+        outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
+        ydl_opts = {
+            "format": "bestaudio/best",
+            "outtmpl": outtmpl,
+            "quiet": True,
+            "no_warnings": True,
+            "noprogress": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "192",
+                }
+            ],
+        }
+        url = f"https://www.youtube.com/watch?v={video_id}"
+
+        def _dl():
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+
+        await asyncio.get_event_loop().run_in_executor(None, _dl)
+
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            return file_path
+        for name in os.listdir(DOWNLOAD_DIR):
+            if name.startswith(video_id):
+                path = os.path.join(DOWNLOAD_DIR, name)
+                if os.path.getsize(path) > 0:
+                    return path
+    except Exception as e:
+        print(f"[yt-dlp audio] {e}")
+    return None
+
+
+async def _yt_dlp_video(video_id: str, file_path: str) -> str:
+    try:
+        outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
+        ydl_opts = {
+            "format": "best[height<=720]/best",
+            "outtmpl": outtmpl,
+            "quiet": True,
+            "no_warnings": True,
+            "noprogress": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+        }
+        url = f"https://www.youtube.com/watch?v={video_id}"
+
+        def _dl():
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+
+        await asyncio.get_event_loop().run_in_executor(None, _dl)
+
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            return file_path
+        for name in os.listdir(DOWNLOAD_DIR):
+            if name.startswith(video_id):
+                path = os.path.join(DOWNLOAD_DIR, name)
+                if os.path.getsize(path) > 0:
+                    return path
+    except Exception as e:
+        print(f"[yt-dlp video] {e}")
+    return None
+
+
 async def download_song(link: str) -> str:
-    video_id = link.split("v=")[-1].split("&")[0] if "v=" in link else link
+    video_id = _extract_id(link)
     if not video_id or len(video_id) < 3:
         return None
 
@@ -30,32 +108,34 @@ async def download_song(link: str) -> str:
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
 
+    # 1) Shruti API
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 f"{API_URL}/download",
                 params={"url": video_id, "type": "audio", "api_key": API_KEY},
-                timeout=aiohttp.ClientTimeout(total=300)
+                timeout=aiohttp.ClientTimeout(total=300),
             ) as resp:
-                if resp.status != 200:
-                    return None
-                with open(file_path, "wb") as f:
-                    async for chunk in resp.content.iter_chunked(131072):
-                        f.write(chunk)
-        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-            return file_path
-        return None
-    except Exception:
+                if resp.status == 200:
+                    with open(file_path, "wb") as f:
+                        async for chunk in resp.content.iter_chunked(131072):
+                            f.write(chunk)
+                    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+                        return file_path
+    except Exception as e:
+        print(f"[API audio] {e}")
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)
             except Exception:
                 pass
-        return None
+
+    # 2) yt-dlp fallback
+    return await _yt_dlp_audio(video_id, file_path)
 
 
 async def download_video(link: str) -> str:
-    video_id = link.split("v=")[-1].split("&")[0] if "v=" in link else link
+    video_id = _extract_id(link)
     if not video_id or len(video_id) < 3:
         return None
 
@@ -64,28 +144,30 @@ async def download_video(link: str) -> str:
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
 
+    # 1) Shruti API
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 f"{API_URL}/download",
                 params={"url": video_id, "type": "video", "api_key": API_KEY},
-                timeout=aiohttp.ClientTimeout(total=600)
+                timeout=aiohttp.ClientTimeout(total=600),
             ) as resp:
-                if resp.status != 200:
-                    return None
-                with open(file_path, "wb") as f:
-                    async for chunk in resp.content.iter_chunked(131072):
-                        f.write(chunk)
-        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-            return file_path
-        return None
-    except Exception:
+                if resp.status == 200:
+                    with open(file_path, "wb") as f:
+                        async for chunk in resp.content.iter_chunked(131072):
+                            f.write(chunk)
+                    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+                        return file_path
+    except Exception as e:
+        print(f"[API video] {e}")
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)
             except Exception:
                 pass
-        return None
+
+    # 2) yt-dlp fallback
+    return await _yt_dlp_video(video_id, file_path)
 
 
 class YouTubeAPI:
@@ -94,7 +176,7 @@ class YouTubeAPI:
         self.regex = r"(?:youtube\.com|youtu\.be)"
         self.status = "https://www.youtube.com/oembed?url="
         self.listbase = "https://youtube.com/playlist?list="
-        self.reg = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+        self.reg = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-\~])")
 
     async def exists(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
