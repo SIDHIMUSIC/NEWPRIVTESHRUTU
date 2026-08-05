@@ -34,24 +34,38 @@ def _extract_id(link: str) -> str:
 
 def _base_ydl_opts(outtmpl: str) -> dict:
     opts = {
-        "format": "bestaudio/best",
         "outtmpl": outtmpl,
         "quiet": True,
         "no_warnings": True,
         "noprogress": True,
         "geo_bypass": True,
         "nocheckcertificate": True,
-        "retries": 3,
-        "fragment_retries": 3,
+        "retries": 5,
+        "fragment_retries": 5,
+        "ignoreerrors": False,
     }
     if os.path.exists(COOKIES_FILE):
         opts["cookiefile"] = COOKIES_FILE
     return opts
 
 
+def _find_downloaded(video_id: str) -> str:
+    if not os.path.isdir(DOWNLOAD_DIR):
+        return None
+    for name in os.listdir(DOWNLOAD_DIR):
+        if name.startswith(video_id):
+            path = os.path.join(DOWNLOAD_DIR, name)
+            if os.path.isfile(path) and os.path.getsize(path) > 0:
+                return path
+    return None
+
+
 async def _yt_dlp_audio(video_id: str, file_path: str) -> str:
+    url = f"https://www.youtube.com/watch?v={video_id}"
+    outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
+
+    # Try 1: bestaudio → mp3
     try:
-        outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
         ydl_opts = _base_ydl_opts(outtmpl)
         ydl_opts["format"] = "bestaudio/best"
         ydl_opts["postprocessors"] = [
@@ -61,48 +75,79 @@ async def _yt_dlp_audio(video_id: str, file_path: str) -> str:
                 "preferredquality": "192",
             }
         ]
-        url = f"https://www.youtube.com/watch?v={video_id}"
 
         def _dl():
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
 
         await asyncio.get_event_loop().run_in_executor(None, _dl)
-
-        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-            return file_path
-        for name in os.listdir(DOWNLOAD_DIR):
-            if name.startswith(video_id):
-                path = os.path.join(DOWNLOAD_DIR, name)
-                if os.path.isfile(path) and os.path.getsize(path) > 0:
-                    return path
+        found = _find_downloaded(video_id)
+        if found:
+            return found
     except Exception as e:
-        print(f"[yt-dlp audio] {e}")
+        print(f"[yt-dlp audio try1] {e}")
+
+    # Try 2: m4a / any audio, no postprocess
+    try:
+        ydl_opts = _base_ydl_opts(outtmpl)
+        ydl_opts["format"] = "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best"
+
+        def _dl2():
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+
+        await asyncio.get_event_loop().run_in_executor(None, _dl2)
+        found = _find_downloaded(video_id)
+        if found:
+            return found
+    except Exception as e:
+        print(f"[yt-dlp audio try2] {e}")
+
+    # Try 3: any format
+    try:
+        ydl_opts = _base_ydl_opts(outtmpl)
+        ydl_opts["format"] = "best"
+
+        def _dl3():
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+
+        await asyncio.get_event_loop().run_in_executor(None, _dl3)
+        found = _find_downloaded(video_id)
+        if found:
+            return found
+    except Exception as e:
+        print(f"[yt-dlp audio try3] {e}")
+
     return None
 
 
 async def _yt_dlp_video(video_id: str, file_path: str) -> str:
-    try:
-        outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
-        ydl_opts = _base_ydl_opts(outtmpl)
-        ydl_opts["format"] = "best[height<=720]/best"
-        url = f"https://www.youtube.com/watch?v={video_id}"
+    url = f"https://www.youtube.com/watch?v={video_id}"
+    outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
 
-        def _dl():
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([url])
+    formats = [
+        "best[height<=720]/best[height<=480]/best",
+        "bestvideo[height<=720]+bestaudio/best",
+        "best",
+    ]
+    for fmt in formats:
+        try:
+            ydl_opts = _base_ydl_opts(outtmpl)
+            ydl_opts["format"] = fmt
+            ydl_opts["merge_output_format"] = "mp4"
 
-        await asyncio.get_event_loop().run_in_executor(None, _dl)
+            def _dl():
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([url])
 
-        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-            return file_path
-        for name in os.listdir(DOWNLOAD_DIR):
-            if name.startswith(video_id):
-                path = os.path.join(DOWNLOAD_DIR, name)
-                if os.path.isfile(path) and os.path.getsize(path) > 0:
-                    return path
-    except Exception as e:
-        print(f"[yt-dlp video] {e}")
+            await asyncio.get_event_loop().run_in_executor(None, _dl)
+            found = _find_downloaded(video_id)
+            if found:
+                return found
+        except Exception as e:
+            print(f"[yt-dlp video {fmt}] {e}")
+            continue
     return None
 
 
@@ -116,7 +161,7 @@ async def download_song(link: str) -> str:
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
 
-    # 1) Shruti API
+    # 1) API
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
@@ -140,7 +185,7 @@ async def download_song(link: str) -> str:
             except Exception:
                 pass
 
-    # 2) yt-dlp (+ cookies if present)
+    # 2) yt-dlp
     return await _yt_dlp_audio(video_id, file_path)
 
 
@@ -154,7 +199,7 @@ async def download_video(link: str) -> str:
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
 
-    # 1) Shruti API
+    # 1) API
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
@@ -178,7 +223,7 @@ async def download_video(link: str) -> str:
             except Exception:
                 pass
 
-    # 2) yt-dlp (+ cookies if present)
+    # 2) yt-dlp
     return await _yt_dlp_video(video_id, file_path)
 
 
