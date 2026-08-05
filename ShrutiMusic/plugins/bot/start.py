@@ -1,3 +1,4 @@
+import asyncio
 import time
 
 from pyrogram import filters
@@ -24,6 +25,30 @@ from config import BANNED_USERS
 from strings import get_string
 
 
+async def start_animation(message: Message):
+    vip = await message.reply_text(
+        f"**✦ ᴡᴇʟᴄᴏᴍᴇ {message.from_user.mention}**"
+    )
+    await asyncio.sleep(0.3)
+    await vip.edit_text(f"**✦ ᴡᴇʟᴄᴏᴍᴇ {message.from_user.mention} ✨**")
+    await asyncio.sleep(0.3)
+    await vip.edit_text("**✦ ʙᴏᴛ ꜱᴛᴀʀᴛɪɴɢ**")
+    await asyncio.sleep(0.25)
+    await vip.edit_text("**✦ ʙᴏᴛ ꜱᴛᴀʀᴛɪɴɢ .**")
+    await asyncio.sleep(0.25)
+    await vip.edit_text("**✦ ʙᴏᴛ ꜱᴛᴀʀᴛɪɴɢ ..**")
+    await asyncio.sleep(0.25)
+    await vip.edit_text("**✦ ʙᴏᴛ ꜱᴛᴀʀᴛɪɴɢ ...**")
+    await asyncio.sleep(0.3)
+    await vip.edit_text("**✦ ᴘʀᴀɢʏᴀ ᴍᴜꜱɪᴄ ʀᴇᴀᴅʏ 🎵**")
+    await asyncio.sleep(0.4)
+    await vip.delete()
+
+    done = await message.reply_text("❤️‍🔥")
+    await asyncio.sleep(0.4)
+    await done.delete()
+
+
 @app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
@@ -43,7 +68,9 @@ async def start_pm(client, message: Message, _):
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOG_GROUP_ID,
-                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n"
+                         f"<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n"
+                         f"<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
                     parse_mode=ParseMode.HTML,
                 )
             return
@@ -83,37 +110,51 @@ async def start_pm(client, message: Message, _):
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOG_GROUP_ID,
-                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n"
+                         f"<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n"
+                         f"<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
                     parse_mode=ParseMode.HTML,
                 )
+            return
         if name == "start":
             out = private_panel(_)
             UP, CPU, RAM, DISK = await bot_sys_stats()
+            await start_animation(message)
             await message.reply_photo(
                 photo=config.START_IMG_URL,
-                caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
+                caption=_["start_2"].format(
+                    message.from_user.mention, app.mention, UP, DISK, CPU, RAM
+                ),
                 reply_markup=InlineKeyboardMarkup(out),
                 parse_mode=ParseMode.HTML,
             )
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOG_GROUP_ID,
-                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n"
+                         f"<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n"
+                         f"<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
                     parse_mode=ParseMode.HTML,
                 )
+            return
     else:
         out = private_panel(_)
         UP, CPU, RAM, DISK = await bot_sys_stats()
+        await start_animation(message)
         await message.reply_photo(
             photo=config.START_IMG_URL,
-            caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
+            caption=_["start_2"].format(
+                message.from_user.mention, app.mention, UP, DISK, CPU, RAM
+            ),
             reply_markup=InlineKeyboardMarkup(out),
             parse_mode=ParseMode.HTML,
         )
         if await is_on_off(2):
             return await app.send_message(
                 chat_id=config.LOG_GROUP_ID,
-                text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n"
+                     f"<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n"
+                     f"<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
                 parse_mode=ParseMode.HTML,
             )
 
@@ -141,7 +182,7 @@ async def welcome(client, message: Message):
             if await is_banned_user(member.id):
                 try:
                     await message.chat.ban_member(member.id)
-                except:
+                except Exception:
                     pass
             if member.id == app.id:
                 if message.chat.type != ChatType.SUPERGROUP:
