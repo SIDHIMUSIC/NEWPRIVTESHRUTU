@@ -1,7 +1,6 @@
 gTTS
 aiofiles
 aiohttp
-asyncio
 beautifulsoup4
 dnspython
 ffmpeg-python
@@ -11,12 +10,12 @@ heroku3
 httpx
 motor
 numpy
-opencv-python
+opencv-python-headless
 pytz
 pillow==9.5.0
 psutil
 py-tgcalls==0.9.7
-pykeyboard
+keyboard
 kurigram
 python-dotenv
 pyyaml
@@ -29,4 +28,4 @@ unidecode
 youtube-search
 youtube-search-python
 py-yt-search
-yt-dlp
+yt-dlp>=2025.1.26
