@@ -36,15 +36,16 @@ START_GREETS = [
 ]
 
 START_MEDIA = [
-    # Photos
-    {"type": "photo", "url": config.START_IMG_URL},
-    {"type": "photo", "url": "https://graph.org/file/de732e8e438bd2270fb5c-49eba2969fc27376c6.jpg"},
-    {"type": "photo", "url": "https://graph.org/file/6f0488aeb917424f678fd-3d298edc245847ce1f.jpg"},
-    {"type": "photo", "url": "https://graph.org/file/6df72e2743d0e28cfa12e-03dd7cd8478659cc81.jpg"},
-    {"type": "photo", "url": "https://graph.org/file/89adae0b36f3c7ed61f8a-29971bd09b2b067b9e.jpg"},
-    {"type": "photo", "url": "https://graph.org/file/0a598b51a872c36d2a9c5-4f4aa6e6de87bea8d6.jpg"},
-    {"type": "photo", "url": "https://graph.org/file/556615482003de63f32be-58c192c7e65004f9d4.jpg"},
-    # Videos
+    # Photos OFF
+    # {"type": "photo", "url": config.START_IMG_URL},
+    # {"type": "photo", "url": "https://graph.org/file/de732e8e438bd2270fb5c-49eba2969fc27376c6.jpg"},
+    # {"type": "photo", "url": "https://graph.org/file/6f0488aeb917424f678fd-3d298edc245847ce1f.jpg"},
+    # {"type": "photo", "url": "https://graph.org/file/6df72e2743d0e28cfa12e-03dd7cd8478659cc81.jpg"},
+    # {"type": "photo", "url": "https://graph.org/file/89adae0b36f3c7ed61f8a-29971bd09b2b067b9e.jpg"},
+    # {"type": "photo", "url": "https://graph.org/file/0a598b51a872c36d2a9c5-4f4aa6e6de87bea8d6.jpg"},
+    # {"type": "photo", "url": "https://graph.org/file/556615482003de63f32be-58c192c7e65004f9d4.jpg"},
+
+    # Videos ON (random)
     {"type": "video", "url": "https://graph.org/file/8177ce4e792492d6a42b6-b0666d400e69ffa81b.mp4"},
     {"type": "video", "url": "https://graph.org/file/3d8d031febeba8b435af3-43c26bbac2b8a6e143.mp4"},
     {"type": "video", "url": "https://graph.org/file/881dae734ccdfb9c0eb02-f08c986bf85299fafd.mp4"},
@@ -117,11 +118,16 @@ async def start_pm(client, message: Message, _):
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
             keyboard = help_pannel_page1(_)
-            return await send_start_media(
+            await send_start_media(
                 message,
                 _["help_1"].format(config.SUPPORT_GROUP),
                 keyboard,
             )
+            try:
+                await message.delete()
+            except Exception:
+                pass
+            return
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
             if await is_on_off(2):
@@ -186,6 +192,10 @@ async def start_pm(client, message: Message, _):
                 ),
                 InlineKeyboardMarkup(out),
             )
+            try:
+                await message.delete()
+            except Exception:
+                pass
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOG_GROUP_ID,
@@ -206,6 +216,10 @@ async def start_pm(client, message: Message, _):
             ),
             InlineKeyboardMarkup(out),
         )
+        try:
+            await message.delete()
+        except Exception:
+            pass
         if await is_on_off(2):
             return await app.send_message(
                 chat_id=config.LOG_GROUP_ID,
@@ -226,6 +240,10 @@ async def start_gp(client, message: Message, _):
         _["start_1"].format(app.mention, get_readable_time(uptime)),
         InlineKeyboardMarkup(out),
     )
+    try:
+        await message.delete()
+    except Exception:
+        pass
     return await add_served_chat(message.chat.id)
 
 
