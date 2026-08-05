@@ -1,4 +1,5 @@
 import asyncio
+import random
 import time
 
 from pyrogram import filters
@@ -25,13 +26,66 @@ from config import BANNED_USERS
 from strings import get_string
 
 
+START_GREETS = [
+    "✦ ʜᴇʏ",
+    "✦ ᴡᴇʟᴄᴏᴍᴇ ʙᴀᴄᴋ",
+    "✦ ɢʟᴀᴅ ʏᴏᴜ'ʀᴇ ʜᴇʀᴇ",
+    "✦ ʜᴇʟʟᴏ",
+    "✦ ɴᴀᴍᴀꜱᴛᴇ",
+    "✦ ᴡᴇʟᴄᴏᴍᴇ",
+]
+
+START_MEDIA = [
+    # Photos
+    {"type": "photo", "url": config.START_IMG_URL},
+    {"type": "photo", "url": "https://graph.org/file/de732e8e438bd2270fb5c-49eba2969fc27376c6.jpg"},
+    {"type": "photo", "url": "https://graph.org/file/6f0488aeb917424f678fd-3d298edc245847ce1f.jpg"},
+    {"type": "photo", "url": "https://graph.org/file/6df72e2743d0e28cfa12e-03dd7cd8478659cc81.jpg"},
+    {"type": "photo", "url": "https://graph.org/file/89adae0b36f3c7ed61f8a-29971bd09b2b067b9e.jpg"},
+    {"type": "photo", "url": "https://graph.org/file/0a598b51a872c36d2a9c5-4f4aa6e6de87bea8d6.jpg"},
+    {"type": "photo", "url": "https://graph.org/file/556615482003de63f32be-58c192c7e65004f9d4.jpg"},
+    # Videos
+    {"type": "video", "url": "https://graph.org/file/8177ce4e792492d6a42b6-b0666d400e69ffa81b.mp4"},
+    {"type": "video", "url": "https://graph.org/file/3d8d031febeba8b435af3-43c26bbac2b8a6e143.mp4"},
+    {"type": "video", "url": "https://graph.org/file/881dae734ccdfb9c0eb02-f08c986bf85299fafd.mp4"},
+    {"type": "video", "url": "https://graph.org/file/8946cb933256633309d39-ba922ab92fa6e204fc.mp4"},
+    {"type": "video", "url": "https://graph.org/file/f85ba6c9b8841d847649d-06ed9f876d677105c4.mp4"},
+    {"type": "video", "url": "https://graph.org/file/0b6c160a27eeb4a8c0097-4f36363c14cac9f01b.mp4"},
+]
+
+
+async def send_start_media(message: Message, caption: str, reply_markup=None):
+    media = random.choice(START_MEDIA)
+    try:
+        if media["type"] == "video":
+            return await message.reply_video(
+                video=media["url"],
+                caption=caption,
+                reply_markup=reply_markup,
+                parse_mode=ParseMode.HTML,
+            )
+        else:
+            return await message.reply_photo(
+                photo=media["url"],
+                caption=caption,
+                reply_markup=reply_markup,
+                parse_mode=ParseMode.HTML,
+            )
+    except Exception:
+        return await message.reply_photo(
+            photo=config.START_IMG_URL,
+            caption=caption,
+            reply_markup=reply_markup,
+            parse_mode=ParseMode.HTML,
+        )
+
+
 async def start_animation(message: Message):
     try:
-        vip = await message.reply_text(
-            f"**✦ ᴡᴇʟᴄᴏᴍᴇ {message.from_user.mention}**"
-        )
+        greet = random.choice(START_GREETS)
+        vip = await message.reply_text(f"**{greet} {message.from_user.mention}**")
         await asyncio.sleep(0.3)
-        await vip.edit_text(f"**✦ ᴡᴇʟᴄᴏᴍᴇ {message.from_user.mention} ✨**")
+        await vip.edit_text(f"**{greet} {message.from_user.mention} ✨**")
         await asyncio.sleep(0.3)
         await vip.edit_text("**✦ ʟᴏᴀᴅɪɴɢ ᴘʀᴇᴍɪᴜᴍ ᴜɪ ...**")
         await asyncio.sleep(0.3)
@@ -63,11 +117,10 @@ async def start_pm(client, message: Message, _):
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
             keyboard = help_pannel_page1(_)
-            return await message.reply_photo(
-                photo=config.START_IMG_URL,
-                caption=_["help_1"].format(config.SUPPORT_GROUP),
-                reply_markup=keyboard,
-                parse_mode=ParseMode.HTML,
+            return await send_start_media(
+                message,
+                _["help_1"].format(config.SUPPORT_GROUP),
+                keyboard,
             )
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
@@ -126,13 +179,12 @@ async def start_pm(client, message: Message, _):
             out = private_panel(_)
             UP, CPU, RAM, DISK = await bot_sys_stats()
             await start_animation(message)
-            await message.reply_photo(
-                photo=config.START_IMG_URL,
-                caption=_["start_2"].format(
+            await send_start_media(
+                message,
+                _["start_2"].format(
                     message.from_user.mention, app.mention, UP, DISK, CPU, RAM
                 ),
-                reply_markup=InlineKeyboardMarkup(out),
-                parse_mode=ParseMode.HTML,
+                InlineKeyboardMarkup(out),
             )
             if await is_on_off(2):
                 return await app.send_message(
@@ -147,13 +199,12 @@ async def start_pm(client, message: Message, _):
         out = private_panel(_)
         UP, CPU, RAM, DISK = await bot_sys_stats()
         await start_animation(message)
-        await message.reply_photo(
-            photo=config.START_IMG_URL,
-            caption=_["start_2"].format(
+        await send_start_media(
+            message,
+            _["start_2"].format(
                 message.from_user.mention, app.mention, UP, DISK, CPU, RAM
             ),
-            reply_markup=InlineKeyboardMarkup(out),
-            parse_mode=ParseMode.HTML,
+            InlineKeyboardMarkup(out),
         )
         if await is_on_off(2):
             return await app.send_message(
@@ -170,11 +221,10 @@ async def start_pm(client, message: Message, _):
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
     uptime = int(time.time() - _boot_)
-    await message.reply_photo(photo=config.START_IMG_URL)
-    await message.reply_text(
+    await send_start_media(
+        message,
         _["start_1"].format(app.mention, get_readable_time(uptime)),
-        reply_markup=InlineKeyboardMarkup(out),
-        parse_mode=ParseMode.HTML,
+        InlineKeyboardMarkup(out),
     )
     return await add_served_chat(message.chat.id)
 
@@ -207,16 +257,15 @@ async def welcome(client, message: Message):
                     return await app.leave_chat(message.chat.id)
 
                 out = start_panel(_)
-                await message.reply_photo(
-                    photo=config.START_IMG_URL,
-                    caption=_["start_3"].format(
+                await send_start_media(
+                    message,
+                    _["start_3"].format(
                         message.from_user.first_name,
                         app.mention,
                         message.chat.title,
                         app.mention,
                     ),
-                    reply_markup=InlineKeyboardMarkup(out),
-                    parse_mode=ParseMode.HTML,
+                    InlineKeyboardMarkup(out),
                 )
                 await add_served_chat(message.chat.id)
                 await message.stop_propagation()
