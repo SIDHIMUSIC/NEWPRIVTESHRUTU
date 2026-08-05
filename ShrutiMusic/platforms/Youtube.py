@@ -9,10 +9,10 @@ from py_yt import VideosSearch, Playlist
 import aiohttp
 
 API_URL = os.environ.get("SHRUTI_API_URL", "https://api01.shrutibots.site")
-API_KEY = os.environ.get("SHRUTI_API_KEY", "YOUR_API_KEY")
+
+API_KEY = os.environ.get("SHRUTI_API_KEY", "YOUR_API_KEY") ## Get This API KEY FROM TELEGRAM BOT USERNAME: @SHRUTIAPIBOT 
 
 DOWNLOAD_DIR = "downloads"
-COOKIES_FILE = os.environ.get("YT_COOKIES", "cookies.txt")
 
 
 def time_to_seconds(time):
@@ -20,172 +20,8 @@ def time_to_seconds(time):
     return sum(int(x) * 60 ** i for i, x in enumerate(reversed(stringt.split(":"))))
 
 
-def _extract_id(link: str) -> str:
-    if not link:
-        return ""
-    if "v=" in link:
-        return link.split("v=")[-1].split("&")[0].split("#")[0]
-    if "youtu.be/" in link:
-        return link.split("youtu.be/")[-1].split("?")[0].split("#")[0]
-    if "youtube.com/shorts/" in link:
-        return link.split("shorts/")[-1].split("?")[0].split("#")[0]
-    return link.strip()
-
-
-def _base_ydl_opts(outtmpl: str = None) -> dict:
-    opts = {
-        "quiet": True,
-        "no_warnings": True,
-        "noprogress": True,
-        "geo_bypass": True,
-        "nocheckcertificate": True,
-        "retries": 5,
-        "fragment_retries": 5,
-        "ignoreerrors": False,
-        "noplaylist": True,
-    }
-    if outtmpl:
-        opts["outtmpl"] = outtmpl
-    if os.path.exists(COOKIES_FILE):
-        opts["cookiefile"] = COOKIES_FILE
-        print(f"[yt-dlp] using cookies: {COOKIES_FILE}")
-    else:
-        print("[yt-dlp] cookies.txt NOT FOUND")
-    return opts
-
-
-def _find_downloaded(video_id: str) -> str:
-    if not os.path.isdir(DOWNLOAD_DIR):
-        return None
-    for name in os.listdir(DOWNLOAD_DIR):
-        if name.startswith(video_id):
-            path = os.path.join(DOWNLOAD_DIR, name)
-            if os.path.isfile(path) and os.path.getsize(path) > 0:
-                return path
-    return None
-
-
-def _pick_format_id(info: dict, audio_only: bool = True) -> str:
-    formats = info.get("formats") or []
-    if not formats:
-        return "best"
-
-    if audio_only:
-        candidates = [
-            f for f in formats
-            if f.get("acodec") not in (None, "none")
-            and f.get("vcodec") in (None, "none")
-            and f.get("format_id")
-        ]
-        if not candidates:
-            candidates = [
-                f for f in formats
-                if f.get("acodec") not in (None, "none") and f.get("format_id")
-            ]
-    else:
-        candidates = [f for f in formats if f.get("format_id")]
-
-    if not candidates:
-        return "best"
-
-    candidates = sorted(
-        candidates,
-        key=lambda x: (x.get("abr") or x.get("tbr") or x.get("height") or 0),
-        reverse=True,
-    )
-    return candidates[0]["format_id"]
-
-
-async def _yt_dlp_audio(video_id: str, file_path: str) -> str:
-    url = f"https://www.youtube.com/watch?v={video_id}"
-    outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
-
-    def _download():
-        # extract info → pick real format_id
-        info_opts = _base_ydl_opts()
-        with yt_dlp.YoutubeDL(info_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-
-        fmt_id = _pick_format_id(info, audio_only=True)
-        print(f"[yt-dlp audio] format_id={fmt_id}")
-
-        dl_opts = _base_ydl_opts(outtmpl)
-        dl_opts["format"] = fmt_id
-        dl_opts["postprocessors"] = [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "192",
-            }
-        ]
-        try:
-            with yt_dlp.YoutubeDL(dl_opts) as ydl:
-                ydl.download([url])
-        except Exception as e:
-            print(f"[yt-dlp audio postprocess fail] {e}")
-            dl_opts.pop("postprocessors", None)
-            with yt_dlp.YoutubeDL(dl_opts) as ydl:
-                ydl.download([url])
-
-    try:
-        await asyncio.get_event_loop().run_in_executor(None, _download)
-        return _find_downloaded(video_id)
-    except Exception as e:
-        print(f"[yt-dlp audio] {e}")
-        # last resort: plain best
-        try:
-            def _dl_best():
-                opts = _base_ydl_opts(outtmpl)
-                opts["format"] = "best"
-                with yt_dlp.YoutubeDL(opts) as ydl:
-                    ydl.download([url])
-
-            await asyncio.get_event_loop().run_in_executor(None, _dl_best)
-            return _find_downloaded(video_id)
-        except Exception as e2:
-            print(f"[yt-dlp audio last] {e2}")
-    return None
-
-
-async def _yt_dlp_video(video_id: str, file_path: str) -> str:
-    url = f"https://www.youtube.com/watch?v={video_id}"
-    outtmpl = os.path.join(DOWNLOAD_DIR, f"{video_id}.%(ext)s")
-
-    def _download():
-        info_opts = _base_ydl_opts()
-        with yt_dlp.YoutubeDL(info_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-
-        fmt_id = _pick_format_id(info, audio_only=False)
-        print(f"[yt-dlp video] format_id={fmt_id}")
-
-        dl_opts = _base_ydl_opts(outtmpl)
-        dl_opts["format"] = fmt_id
-        dl_opts["merge_output_format"] = "mp4"
-        with yt_dlp.YoutubeDL(dl_opts) as ydl:
-            ydl.download([url])
-
-    try:
-        await asyncio.get_event_loop().run_in_executor(None, _download)
-        return _find_downloaded(video_id)
-    except Exception as e:
-        print(f"[yt-dlp video] {e}")
-        try:
-            def _dl_best():
-                opts = _base_ydl_opts(outtmpl)
-                opts["format"] = "best"
-                with yt_dlp.YoutubeDL(opts) as ydl:
-                    ydl.download([url])
-
-            await asyncio.get_event_loop().run_in_executor(None, _dl_best)
-            return _find_downloaded(video_id)
-        except Exception as e2:
-            print(f"[yt-dlp video last] {e2}")
-    return None
-
-
 async def download_song(link: str) -> str:
-    video_id = _extract_id(link)
+    video_id = link.split("v=")[-1].split("&")[0] if "v=" in link else link
     if not video_id or len(video_id) < 3:
         return None
 
@@ -194,36 +30,32 @@ async def download_song(link: str) -> str:
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
 
-    # 1) API
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 f"{API_URL}/download",
                 params={"url": video_id, "type": "audio", "api_key": API_KEY},
-                timeout=aiohttp.ClientTimeout(total=300),
+                timeout=aiohttp.ClientTimeout(total=300)
             ) as resp:
-                if resp.status == 200:
-                    with open(file_path, "wb") as f:
-                        async for chunk in resp.content.iter_chunked(131072):
-                            f.write(chunk)
-                    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-                        return file_path
-                else:
-                    print(f"[API audio] status={resp.status}")
-    except Exception as e:
-        print(f"[API audio] {e}")
+                if resp.status != 200:
+                    return None
+                with open(file_path, "wb") as f:
+                    async for chunk in resp.content.iter_chunked(131072):
+                        f.write(chunk)
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            return file_path
+        return None
+    except Exception:
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)
             except Exception:
                 pass
-
-    # 2) yt-dlp dynamic format
-    return await _yt_dlp_audio(video_id, file_path)
+        return None
 
 
 async def download_video(link: str) -> str:
-    video_id = _extract_id(link)
+    video_id = link.split("v=")[-1].split("&")[0] if "v=" in link else link
     if not video_id or len(video_id) < 3:
         return None
 
@@ -232,32 +64,28 @@ async def download_video(link: str) -> str:
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
 
-    # 1) API
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 f"{API_URL}/download",
                 params={"url": video_id, "type": "video", "api_key": API_KEY},
-                timeout=aiohttp.ClientTimeout(total=600),
+                timeout=aiohttp.ClientTimeout(total=600)
             ) as resp:
-                if resp.status == 200:
-                    with open(file_path, "wb") as f:
-                        async for chunk in resp.content.iter_chunked(131072):
-                            f.write(chunk)
-                    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-                        return file_path
-                else:
-                    print(f"[API video] status={resp.status}")
-    except Exception as e:
-        print(f"[API video] {e}")
+                if resp.status != 200:
+                    return None
+                with open(file_path, "wb") as f:
+                    async for chunk in resp.content.iter_chunked(131072):
+                        f.write(chunk)
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            return file_path
+        return None
+    except Exception:
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)
             except Exception:
                 pass
-
-    # 2) yt-dlp
-    return await _yt_dlp_video(video_id, file_path)
+        return None
 
 
 class YouTubeAPI:
@@ -266,7 +94,7 @@ class YouTubeAPI:
         self.regex = r"(?:youtube\.com|youtu\.be)"
         self.status = "https://www.youtube.com/oembed?url="
         self.listbase = "https://youtube.com/playlist?list="
-        self.reg = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-\~])")
+        self.reg = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
     async def exists(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
@@ -389,7 +217,7 @@ class YouTubeAPI:
             link = self.base + link
         if "&" in link:
             link = link.split("&")[0]
-        ytdl_opts = _base_ydl_opts()
+        ytdl_opts = {"quiet": True}
         ydl = yt_dlp.YoutubeDL(ytdl_opts)
         with ydl:
             formats_available = []
