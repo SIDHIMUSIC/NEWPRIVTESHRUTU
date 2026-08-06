@@ -37,7 +37,7 @@ PE = {
 
 def pe(name: str) -> str:
     eid = PE.get(name, PE["commn"])
-    return f'<emoji id="{eid}">🎤</emoji>'
+    return f'<emoji id="{eid}">👾</emoji>'
 
 
 def btn(text: str, url: str = None, pe_name: str = None, **kwargs):
