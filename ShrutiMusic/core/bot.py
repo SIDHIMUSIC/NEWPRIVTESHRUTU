@@ -17,6 +17,37 @@ BOOT_MEDIA = [
     "https://graph.org/file/0b6c160a27eeb4a8c0097-4f36363c14cac9f01b.mp4",
 ]
 
+PE = {
+    "owner": "6118209143972040877",
+    "support": "5019759554234156094",
+    "channel": "6145175650190759830",
+    "add": "6033108614724456536",
+    "comman": "6030656587830399914",
+    "network": "5375177250553487549",
+    "source": "6030656587830399914",
+    "back": "5215260113291455937",
+    "pfp": "5215503483318325191",
+    "igram": "4990082283701535678",
+    "commn": "6026367225466720832",
+    "ghub": "5933540612694347912",
+    "ytune": "6267086316907795595",
+    "dont": "6237651574588445185",
+}
+
+
+def pe(name: str) -> str:
+    eid = PE.get(name, PE["commn"])
+    return f'<emoji id="{eid}">🎤</emoji>'
+
+
+def btn(text: str, url: str = None, pe_name: str = None, **kwargs):
+    data = {"text": text, **kwargs}
+    if url:
+        data["url"] = url
+    if pe_name and pe_name in PE:
+        data["icon_custom_emoji_id"] = PE[pe_name]
+    return InlineKeyboardButton(**data)
+
 
 class Nand(Client):
     def __init__(self):
@@ -42,34 +73,29 @@ class Nand(Client):
         button = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton(
-                        text="⦿ ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ ⦿",
+                    btn(
+                        "ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ",
                         url=f"https://t.me/{self.username}?startgroup=true",
+                        pe_name="add",
                     )
                 ],
                 [
-                    InlineKeyboardButton(
-                        text="📢 ꜱᴜᴘᴘᴏʀᴛ",
-                        url=config.SUPPORT_CHANNEL,
-                    ),
-                    InlineKeyboardButton(
-                        text="💬 ɢʀᴏᴜᴘ",
-                        url=config.SUPPORT_GROUP,
-                    ),
+                    btn("ꜱᴜᴘᴘᴏʀᴛ", url=config.SUPPORT_CHANNEL, pe_name="support"),
+                    btn("ɢʀᴏᴜᴘ", url=config.SUPPORT_GROUP, pe_name="channel"),
                 ],
             ]
         )
 
         caption = (
-            f"<b>✦ ᴘʀᴀɢʏᴀ ᴍᴜꜱɪᴄ ᴏɴʟɪɴᴇ</b>\n"
+            f"{pe('network')} <b>ᴘʀᴀɢʏᴀ ᴍᴜꜱɪᴄ ᴏɴʟɪɴᴇ</b>\n"
             f"━━━━━━━━━━━━━━━━━━\n\n"
-            f"<b>🎵 ɴᴀᴍᴇ :</b> {self.name}\n"
-            f"<b>🔗 ᴜꜱᴇʀɴᴀᴍᴇ :</b> @{self.username}\n"
-            f"<b>🆔 ɪᴅ :</b> <code>{self.id}</code>\n\n"
-            f"<b>⚡ ꜱᴛᴀᴛᴜꜱ :</b> <code>ʀᴜɴɴɪɴɢ</code>\n"
-            f"<b>💎 ᴍᴏᴅᴇ :</b> <code>ᴘʀᴇᴍɪᴜᴍ</code>\n\n"
+            f"{pe('ytune')} <b>ɴᴀᴍᴇ :</b> {self.name}\n"
+            f"{pe('comman')} <b>ᴜꜱᴇʀɴᴀᴍᴇ :</b> @{self.username}\n"
+            f"{pe('owner')} <b>ɪᴅ :</b> <code>{self.id}</code>\n\n"
+            f"{pe('dont')} <b>ꜱᴛᴀᴛᴜꜱ :</b> <code>ʀᴜɴɴɪɴɢ</code>\n"
+            f"{pe('pfp')} <b>ᴍᴏᴅᴇ :</b> <code>ᴘʀᴇᴍɪᴜᴍ</code>\n\n"
             f"━━━━━━━━━━━━━━━━━━\n"
-            f"<i>✦ ʙᴏᴛ ɪꜱ ʀᴇᴀᴅʏ ᴛᴏ ꜱᴇʀᴠᴇ ✨</i>"
+            f"{pe('source')} <i>ʙᴏᴛ ɪꜱ ʀᴇᴀᴅʏ ᴛᴏ ꜱᴇʀᴠᴇ</i> {pe('network')}"
         )
 
         if config.LOG_GROUP_ID:
