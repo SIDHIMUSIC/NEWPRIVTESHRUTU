@@ -15,10 +15,8 @@ if isinstance(OWNER_ID, int):
 else:
     OWNERS = list(OWNER_ID) if OWNER_ID else []
 
-SOURCE_DB = "Yukki"
-# bot ke core/mongo.py mein jo naam hai wahi yahan likho
-# tumhare repo mein: mongodb = _mongo_async_.Yukki
-TARGET_DB = "Yukki"
+SOURCE_DB = "VIPMUSIC"   # yahan se data lega
+TARGET_DB = "Yukki"      # yahan daleega
 
 COLLECTIONS = [
     "tgusersdb",
@@ -26,6 +24,9 @@ COLLECTIONS = [
     "sudoers",
     "blockedusers",
     "assistants",
+    "chatstats",
+    "userstats",
+    "queries",
 ]
 
 
@@ -55,11 +56,12 @@ async def db_info(_, message: Message):
             f"🗂 <b>DB INFO</b>\n\n"
             f"<b>Source ({SOURCE_DB}):</b>\n"
             f"• Users: <code>{src_users}</code>\n"
-            f"• Chats: <code>{src_chats}</code>\n\n"
+            f"• Chats: <code>{src_chats}</code>\n"
+            f"• Collections: <code>{', '.join(src_cols) if src_cols else 'none'}</code>\n\n"
             f"<b>Target ({TARGET_DB}):</b>\n"
             f"• Users: <code>{tgt_users}</code>\n"
             f"• Chats: <code>{tgt_chats}</code>\n\n"
-            f"{'⚠️ Source = Target (same DB)' if SOURCE_DB == TARGET_DB else '➡ /migrate chalao'}"
+            f"➡ <code>/migrate</code> se VIPMUSIC → Yukki copy"
         )
     except Exception as e:
         await message.reply_text(f"❌ <code>{e}</code>")
@@ -67,16 +69,9 @@ async def db_info(_, message: Message):
 
 @app.on_message(filters.command(["migrate"]) & filters.user(OWNERS))
 async def migrate_db(_, message: Message):
-    if SOURCE_DB == TARGET_DB:
-        return await message.reply_text(
-            "⚠️ Source aur Target dono <b>Yukki</b> hain.\n"
-            "Bot pehle se Yukki use karta hai.\n\n"
-            "Check karo: <code>ShrutiMusic/core/mongo.py</code>\n"
-            "<code>mongodb = _mongo_async_.Yukki</code>\n\n"
-            "Agar /stats kam dikha raha hai to alag issue hai, migrate se fix nahi hoga."
-        )
-
-    status = await message.reply_text("⏳ <b>Migrating...</b>")
+    status = await message.reply_text(
+        f"⏳ <b>Migrating</b>\n<code>{SOURCE_DB}</code> → <code>{TARGET_DB}</code>..."
+    )
     try:
         client = _client()
         source = client[SOURCE_DB]
@@ -91,12 +86,12 @@ async def migrate_db(_, message: Message):
 
         for name in COLLECTIONS:
             if name not in src_cols:
-                lines.append(f"⏭ <code>{name}</code>: not found")
+                lines.append(f"⏭ <code>{name}</code>: VIPMUSIC mein nahi")
                 continue
 
             docs = await source[name].find({}).to_list(length=None)
             if not docs:
-                lines.append(f"📭 <code>{name}</code>: 0")
+                lines.append(f"📭 <code>{name}</code>: 0 docs")
                 continue
 
             inserted = skipped = 0
@@ -104,6 +99,7 @@ async def migrate_db(_, message: Message):
                 d = dict(d)
                 d.pop("_id", None)
 
+                # duplicate check
                 if name == "tgusersdb" and "user_id" in d:
                     if await target[name].find_one({"user_id": d["user_id"]}):
                         skipped += 1
@@ -126,7 +122,7 @@ async def migrate_db(_, message: Message):
         t_cols = await target.list_collection_names()
         tu = await target["tgusersdb"].count_documents({}) if "tgusersdb" in t_cols else 0
         tc = await target["chats"].count_documents({}) if "chats" in t_cols else 0
-        lines.append(f"\n📊 Target now: <b>{tu}</b> users | <b>{tc}</b> chats")
+        lines.append(f"\n📊 <b>Yukki now:</b> {tu} users | {tc} chats")
         await status.edit_text("\n".join(lines))
     except Exception as e:
         await status.edit_text(f"❌ <code>{e}</code>")
