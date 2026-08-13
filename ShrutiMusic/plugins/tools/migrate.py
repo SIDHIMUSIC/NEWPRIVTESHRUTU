@@ -1,14 +1,24 @@
-import asyncio
 from pyrogram import filters
 from pyrogram.types import Message
 from motor.motor_asyncio import AsyncIOMotorClient
 
 import config
 from ShrutiMusic import app
-from config import OWNER_ID
 
-# Purana DB jahan 2553 users hain
-SOURCE_DB_NAME = "Yukki"
+try:
+    from config import OWNER_ID
+except Exception:
+    OWNER_ID = []
+
+# agar OWNER_ID int hai to list bana do
+if isinstance(OWNER_ID, int):
+    OWNERS = [OWNER_ID]
+else:
+    OWNERS = list(OWNER_ID) if OWNER_ID else []
+
+SOURCE_DB = "Yukki"
+# jab URI mein DB name na ho to motor aksar 'test' use karta hai
+FALLBACK_TARGET = "test"
 
 COLLECTIONS = [
     "tgusersdb",
@@ -19,99 +29,119 @@ COLLECTIONS = [
 ]
 
 
-@app.on_message(filters.command("migrate") & filters.user(OWNER_ID))
-async def migrate_db(_, message: Message):
-    status = await message.reply_text("⏳ <b>Migration start...</b>")
+def _client():
+    # config se URI lo (Heroku Config Vars)
+    uri = getattr(config, "MONGO_DB_URI", None) or getattr(config, "MONGO_URL", None)
+    if not uri:
+        raise RuntimeError("MONGO_DB_URI not found in config")
+    return AsyncIOMotorClient(uri)
 
+
+@app.on_message(filters.command(["dbinfo"]) & filters.user(OWNERS))
+async def db_info(_, message: Message):
     try:
-        client = AsyncIOMotorClient(config.MONGO_DB_URI)
-        
-        # source = Yukki
-        source = client[SOURCE_DB_NAME]
-        
-        # target = jo DB ab bot use kar raha hai
-        # URI mein /Yukki nahi hai to motor default DB leti hai
+        client = _client()
+        source = client[SOURCE_DB]
         target = client.get_default_database()
         if target is None:
-            # fallback — apna current DB name yahan likho
-            target = client["test"]
+            target = client[FALLBACK_TARGET]
 
-        lines = [f"📂 Source: <code>{SOURCE_DB_NAME}</code>"]
-        lines.append(f"📁 Target: <code>{target.name}</code>\n")
+        src_users = await source["tgusersdb"].count_documents({})
+        src_chats = (
+            await source["chats"].count_documents({})
+            if "chats" in await source.list_collection_names()
+            else 0
+        )
+
+        t_cols = await target.list_collection_names()
+        tgt_users = (
+            await target["tgusersdb"].count_documents({})
+            if "tgusersdb" in t_cols
+            else 0
+        )
+        tgt_chats = (
+            await target["chats"].count_documents({}) if "chats" in t_cols else 0
+        )
+
+        await message.reply_text(
+            f"🗂 <b>DB INFO</b>\n\n"
+            f"<b>Source ({SOURCE_DB}):</b>\n"
+            f"• Users: <code>{src_users}</code>\n"
+            f"• Chats: <code>{src_chats}</code>\n\n"
+            f"<b>Target ({target.name}):</b>\n"
+            f"• Users: <code>{tgt_users}</code>\n"
+            f"• Chats: <code>{tgt_chats}</code>\n\n"
+            f"➡ Ab <code>/migrate</code> chalao"
+        )
+    except Exception as e:
+        await message.reply_text(f"❌ <code>{e}</code>")
+
+
+@app.on_message(filters.command(["migrate"]) & filters.user(OWNERS))
+async def migrate_db(_, message: Message):
+    status = await message.reply_text("⏳ <b>Migrating from Yukki...</b>")
+    try:
+        client = _client()
+        source = client[SOURCE_DB]
+        target = client.get_default_database()
+        if target is None:
+            target = client[FALLBACK_TARGET]
+
+        if source.name == target.name:
+            return await status.edit_text(
+                "⚠️ Source aur Target same DB hain.\n"
+                "URI mein DB name hatao ya target alag karo."
+            )
+
+        lines = [
+            f"📂 <b>Source:</b> <code>{source.name}</code>",
+            f"📁 <b>Target:</b> <code>{target.name}</code>",
+            "",
+        ]
+
+        src_cols = await source.list_collection_names()
 
         for name in COLLECTIONS:
-            colls = await source.list_collection_names()
-            if name not in colls:
-                lines.append(f"⏭ {name}: not found")
+            if name not in src_cols:
+                lines.append(f"⏭ <code>{name}</code>: not in Yukki")
                 continue
 
             docs = await source[name].find({}).to_list(length=None)
             if not docs:
-                lines.append(f"📭 {name}: 0 docs")
+                lines.append(f"📭 <code>{name}</code>: 0")
                 continue
-
-            # _id hata ke insert (duplicate avoid alag se)
-            clean = []
-            for d in docs:
-                d = dict(d)
-                d.pop("_id", None)
-                clean.append(d)
 
             inserted = 0
             skipped = 0
-            for d in clean:
-                # users: user_id se check
+
+            for d in docs:
+                d = dict(d)
+                d.pop("_id", None)
+
                 if name == "tgusersdb" and "user_id" in d:
-                    exists = await target[name].find_one({"user_id": d["user_id"]})
-                    if exists:
+                    if await target[name].find_one({"user_id": d["user_id"]}):
                         skipped += 1
                         continue
                 elif name == "chats" and "chat_id" in d:
-                    exists = await target[name].find_one({"chat_id": d["chat_id"]})
-                    if exists:
+                    if await target[name].find_one({"chat_id": d["chat_id"]}):
                         skipped += 1
                         continue
+
                 try:
                     await target[name].insert_one(d)
                     inserted += 1
                 except Exception:
                     skipped += 1
 
-            lines.append(f"✅ {name}: +{inserted} | skip {skipped} | total {len(docs)}")
+            lines.append(
+                f"✅ <code>{name}</code>: +{inserted} | skip {skipped} | src {len(docs)}"
+            )
 
-        # final count
-        try:
-            u = await target["tgusersdb"].count_documents({})
-            c = await target["chats"].count_documents({})
-            lines.append(f"\n📊 Target ab: <b>{u}</b> users | <b>{c}</b> chats")
-        except Exception:
-            pass
+        t_cols = await target.list_collection_names()
+        tu = await target["tgusersdb"].count_documents({}) if "tgusersdb" in t_cols else 0
+        tc = await target["chats"].count_documents({}) if "chats" in t_cols else 0
+        lines.append(f"\n📊 <b>Target now:</b> {tu} users | {tc} chats")
 
         await status.edit_text("\n".join(lines))
     except Exception as e:
-        await status.edit_text(f"❌ Error:\n<code>{e}</code>")
-
-
-@app.on_message(filters.command("dbinfo") & filters.user(OWNER_ID))
-async def db_info(_, message: Message):
-    try:
-        client = AsyncIOMotorClient(config.MONGO_DB_URI)
-        target = client.get_default_database()
-        if target is None:
-            target = client["test"]
-
-        yukki = client["Yukki"]
-        yu = await yukki["tgusersdb"].count_documents({})
-        yc = await yukki["chats"].count_documents({}) if "chats" in await yukki.list_collection_names() else 0
-
-        tu = await target["tgusersdb"].count_documents({}) if "tgusersdb" in await target.list_collection_names() else 0
-        tc = await target["chats"].count_documents({}) if "chats" in await target.list_collection_names() else 0
-
-        await message.reply_text(
-            f"🗂 <b>DB INFO</b>\n\n"
-            f"<b>Yukki:</b> {yu} users | {yc} chats\n"
-            f"<b>Current ({target.name}):</b> {tu} users | {tc} chats\n\n"
-            f"URI default DB: <code>{target.name}</code>"
-        )
-    except Exception as e:
-        await message.reply_text(f"Error: {e}")
+        await status.edit_text(f"❌ <code>{e}</code>")
