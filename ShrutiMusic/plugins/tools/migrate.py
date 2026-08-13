@@ -15,7 +15,7 @@ if isinstance(OWNER_ID, int):
 else:
     OWNERS = list(OWNER_ID) if OWNER_ID else []
 
-SOURCE_DB = "VIPMUSIC"   # yahan se data lega
+SOURCE_DB = "AnieXErica"   # yahan se data lega
 TARGET_DB = "Yukki"      # yahan daleega
 
 COLLECTIONS = [
