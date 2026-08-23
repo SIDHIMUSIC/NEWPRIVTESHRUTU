@@ -1,66 +1,57 @@
-# Copyright (c) 2025 Nand Yaduwanshi <NoxxOP>
-# Location: Supaul, Bihar
-#
-# All rights reserved.
-#
-# This code is the intellectual property of Nand Yaduwanshi.
-# You are not allowed to copy, modify, redistribute, or use this
-# code for commercial or personal projects without explicit permission.
-#
-# Allowed:
-# - Forking for personal learning
-# - Submitting improvements via pull requests
-#
-# Not Allowed:
-# - Claiming this code as your own
-# - Re-uploading without credit or permission
-# - Selling or using commercially
-#
-# Contact for permissions:
-# Email: badboy809075@gmail.com
-
-
-from pyrogram import Client, filters
+from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from pyrogram.enums import ParseMode
+
 from ShrutiMusic import app
 import config
 
-TEXT = f"""
-🔒 **Privacy Policy for {app.mention} !**
+PE = {
+    "lock": "5291873529464122510",
+    "doc": "5357315181649076022",
+    "support": "5301096984617166561",
+    "user": "5208604387156448480",
+}
 
-Your privacy is important to us. To learn more about how we collect, use, and protect your data, please review our Privacy Policy here: [Privacy Policy]({config.PRIVACY_LINK}).
 
-If you have any questions or concerns, feel free to reach out to our [support team](https://t.me/HARRYASHU).
-"""
+def pe(name: str, fallback: str = "👀") -> str:
+    eid = PE.get(name)
+    if not eid:
+        return fallback
+    return f'<emoji id="{eid}">{fallback}</emoji>'
 
-@app.on_message(filters.command("privacy"))
+
+@app.on_message(filters.command(["privacy", "Privacy"]))
 async def privacy(client, message: Message):
+    text = (
+        f"{pe('lock', '🔒')} <b>Privacy Policy for {app.mention}</b>\n\n"
+        f"Your privacy is important to us. To learn more about how we collect, "
+        f"use, and protect your data, please review our Privacy Policy.\n\n"
+        f"{pe('user', '👤')} If you have any questions, contact our "
+        f"<a href=\"https://t.me/HARRYASHU\">support team</a>."
+    )
+
     keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
-                    "View Privacy Policy", url=config.SUPPORT_GROUP
+                    text="View Privacy Policy",
+                    url=config.PRIVACY_LINK,
+                    icon_custom_emoji_id=int(PE["doc"]),
                 )
-            ]
+            ],
+            [
+                InlineKeyboardButton(
+                    text="Support",
+                    url=config.SUPPORT_GROUP,
+                    icon_custom_emoji_id=int(PE["support"]),
+                )
+            ],
         ]
     )
+
     await message.reply_text(
-        TEXT, 
-        reply_markup=keyboard, 
-        parse_mode=ParseMode.MARKDOWN, 
-        disable_web_page_preview=True
+        text,
+        reply_markup=keyboard,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
     )
-
-
-
-# ©️ Copyright Reserved - @NoxxOP  Nand Yaduwanshi
-
-# ===========================================
-# ©️ 2025 Nand Yaduwanshi (aka @NoxxOP)
-# 🔗 GitHub : https://github.com/NoxxOP/ShrutiMusic
-# 📢 Telegram Channel : https://t.me/ShrutiBots
-# ===========================================
-
-
-# ❤️ Love From ShrutiBots 
