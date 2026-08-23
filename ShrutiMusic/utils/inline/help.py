@@ -21,10 +21,7 @@ def btn(text, callback_data=None, url=None, pe_name=None):
     if url:
         kwargs["url"] = url
     if pe_name and pe_name in PE:
-        try:
-            kwargs["icon_custom_emoji_id"] = int(PE[pe_name])
-        except Exception:
-            kwargs["icon_custom_emoji_id"] = PE[pe_name]
+        kwargs["icon_custom_emoji_id"] = PE[pe_name]
     try:
         return InlineKeyboardButton(**kwargs)
     except TypeError:
@@ -37,7 +34,7 @@ def help_pannel_page1(_, START: Union[bool, int] = None):
         [
             [
                 btn(_["H_B_1"], callback_data="help_callback hb1", pe_name="admin"),
-                btn(_["H_B_2"], callback_data="help_callback hb2", pe_name="auth"),
+                btn(_["H_B_2"], callback_data="help_callback hb2", pe_name="admin"),
             ],
             [
                 btn(_["H_B_3"], callback_data="help_callback hb3", pe_name="broadcast"),
@@ -58,7 +55,7 @@ def help_pannel_page1(_, START: Union[bool, int] = None):
                 btn(
                     _["BACK_BUTTON"] if START else _["CLOSE_BUTTON"],
                     callback_data="settingsback_helper" if START else "close",
-                    pe_name="home",
+                    pe_name="back",
                 ),
                 btn("⏭", callback_data="help_page_2", pe_name="back2"),
             ],
@@ -92,7 +89,7 @@ def help_pannel_page2(_, START: Union[bool, int] = None):
                 btn(
                     _["BACK_BUTTON"] if START else _["CLOSE_BUTTON"],
                     callback_data="settingsback_helper" if START else "close",
-                    pe_name="home",
+                    pe_name="back",
                 ),
                 btn("⏭", callback_data="help_page_3", pe_name="back2"),
             ],
@@ -126,7 +123,7 @@ def help_pannel_page3(_, START: Union[bool, int] = None):
                 btn(
                     _["BACK_BUTTON"] if START else _["CLOSE_BUTTON"],
                     callback_data="settingsback_helper" if START else "close",
-                    pe_name="home",
+                    pe_name="back",
                 ),
                 btn("⏭", callback_data="help_page_4", pe_name="back2"),
             ],
@@ -161,7 +158,7 @@ def help_pannel_page4(_, START: Union[bool, int] = None):
                 btn(
                     _["BACK_BUTTON"] if START else _["CLOSE_BUTTON"],
                     callback_data="settingsback_helper" if START else "close",
-                    pe_name="home",
+                    pe_name="back",
                 ),
                 btn("⏭", callback_data="help_page_1", pe_name="back2"),
             ],
@@ -173,11 +170,7 @@ def help_back_markup(_, page: int = 1):
     return InlineKeyboardMarkup(
         [
             [
-                btn(
-                    _["BACK_BUTTON"],
-                    callback_data=f"help_page_{page}",
-                    pe_name="home",
-                ),
+                btn(_["BACK_BUTTON"], callback_data=f"help_page_{page}", pe_name="home"),
             ]
         ]
     )
