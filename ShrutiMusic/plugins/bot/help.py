@@ -54,8 +54,8 @@ async def _edit_help(update, text, keyboard):
         )
 
 
-@app.on_message(filters.command(["help"]) & filters.private & \~BANNED_USERS)
-@app.on_callback_query(filters.regex(r"^help_page_1$") & \~BANNED_USERS)
+@app.on_message(filters.command(["help"]) & filters.private & ~BANNED_USERS)
+@app.on_callback_query(filters.regex(r"^help_page_1$") & ~BANNED_USERS)
 async def helper_private(client, update: Union[types.Message, types.CallbackQuery]):
     is_callback = isinstance(update, types.CallbackQuery)
     if is_callback:
@@ -86,7 +86,7 @@ async def helper_private(client, update: Union[types.Message, types.CallbackQuer
     )
 
 
-@app.on_callback_query(filters.regex(r"^help_page_2$") & \~BANNED_USERS)
+@app.on_callback_query(filters.regex(r"^help_page_2$") & ~BANNED_USERS)
 async def helper_page2(client, update: types.CallbackQuery):
     try:
         await update.answer()
@@ -97,7 +97,7 @@ async def helper_page2(client, update: types.CallbackQuery):
     await _edit_help(update, _["help_1"].format(SUPPORT_GROUP), help_pannel_page2(_, True))
 
 
-@app.on_callback_query(filters.regex(r"^help_page_3$") & \~BANNED_USERS)
+@app.on_callback_query(filters.regex(r"^help_page_3$") & ~BANNED_USERS)
 async def helper_page3(client, update: types.CallbackQuery):
     try:
         await update.answer()
@@ -108,7 +108,7 @@ async def helper_page3(client, update: types.CallbackQuery):
     await _edit_help(update, _["help_1"].format(SUPPORT_GROUP), help_pannel_page3(_, True))
 
 
-@app.on_callback_query(filters.regex(r"^help_page_4$") & \~BANNED_USERS)
+@app.on_callback_query(filters.regex(r"^help_page_4$") & ~BANNED_USERS)
 async def helper_page4(client, update: types.CallbackQuery):
     try:
         await update.answer()
@@ -119,7 +119,7 @@ async def helper_page4(client, update: types.CallbackQuery):
     await _edit_help(update, _["help_1"].format(SUPPORT_GROUP), help_pannel_page4(_, True))
 
 
-@app.on_message(filters.command(["help"]) & filters.group & \~BANNED_USERS)
+@app.on_message(filters.command(["help"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def help_com_group(client, message: Message, _):
     keyboard = private_help_panel(_)
@@ -131,7 +131,7 @@ async def help_com_group(client, message: Message, _):
     )
 
 
-@app.on_callback_query(filters.regex("help_callback") & \~BANNED_USERS)
+@app.on_callback_query(filters.regex("help_callback") & ~BANNED_USERS)
 @languageCB
 async def helper_cb(client, CallbackQuery, _):
     cb = CallbackQuery.data.strip().split(None, 1)[1]
