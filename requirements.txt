@@ -1,3 +1,4 @@
+pyrofork
 gTTS
 aiofiles
 aiohttp
@@ -15,8 +16,7 @@ pytz
 pillow==9.5.0
 psutil
 py-tgcalls==0.9.7
-keyboard
-kurigram
+kurigram==2.1.35
 python-dotenv
 pyyaml
 requests
