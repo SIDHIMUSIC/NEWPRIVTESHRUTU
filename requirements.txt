@@ -15,7 +15,7 @@ opencv-python-headless
 pytz
 pillow==9.5.0
 psutil
-py-tgcalls==2.0.0
+py-tgcalls>=0.9.7
 kurigram
 python-dotenv
 pyyaml
