@@ -1,4 +1,3 @@
-pyrofork
 gTTS
 aiofiles
 aiohttp
@@ -15,7 +14,8 @@ opencv-python-headless
 pytz
 pillow==9.5.0
 psutil
-py-tgcalls>=0.9.7
+py-tgcalls==0.9.7
+keyboard
 kurigram
 python-dotenv
 pyyaml
